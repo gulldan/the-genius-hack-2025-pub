@@ -1,0 +1,12 @@
+<tr id="signup-<%= it.row.id %>">
+  <td class="py-2"><%= it.row.user_name %></td>
+  <td class="py-2"><%= it.row.role_title %></td>
+  <td class="py-2">
+    <% if (!it.row.attendance) { %>
+      <button class="px-2" hx-post="/coord/checkin" hx-vals='{"signup_id": <%= it.row.id %>, "status":"present"}' hx-target="#signup-<%= it.row.id %>" hx-swap="outerHTML">Present</button>
+      <button class="px-2" hx-post="/coord/checkin" hx-vals='{"signup_id": <%= it.row.id %>, "status":"absent"}' hx-target="#signup-<%= it.row.id %>" hx-swap="outerHTML">Absent</button>
+    <% } else { %>
+      <%= it.row.attendance %>
+    <% } %>
+  </td>
+</tr>

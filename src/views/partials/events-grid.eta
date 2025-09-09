@@ -1,0 +1,128 @@
+<% if (it.events && it.events.length > 0) { %>
+  <% it.events.forEach(event => { %>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+      <!-- Event Image -->
+      <% if (event.cover_url) { %>
+        <img src="<%= event.cover_url %>" alt="<%= event.title %>" class="w-full h-48 object-cover">
+      <% } else { %>
+        <div class="w-full h-48 bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+          <i data-lucide="heart-handshake" class="w-16 h-16 text-white"></i>
+        </div>
+      <% } %>
+      
+      <div class="p-6 flex-1 flex flex-col">
+        <!-- Event Meta -->
+        <div class="flex items-center justify-between text-sm text-slate-500 mb-3">
+          <div class="flex items-center">
+            <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+            <%= event.start_date ? new Date(event.start_date).toLocaleDateString('ru-RU') : event.date %>
+          </div>
+          <% if (event.category) { %>
+            <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+              <%
+                const categoryNames = {
+                  'animals': 'Животные',
+                  'environment': 'Экология',
+                  'social': 'Соц. помощь',
+                  'education': 'Образование',
+                  'health': 'Здоровье',
+                  'culture': 'Культура',
+                  'sports': 'Спорт'
+                };
+              %>
+              <%= categoryNames[event.category] || event.category %>
+            </span>
+          <% } %>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-2">
+          <% if (event.location_type === 'online') { %>
+            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">онлайн</span>
+          <% } else if (event.location_type === 'hybrid') { %>
+            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">гибрид</span>
+          <% } %>
+          <% if (event.waiver_required) { %>
+            <span class="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs">waiver обязателен</span>
+          <% } %>
+        </div>
+        
+        <!-- Title -->
+        <h3 class="text-xl font-semibold mb-2 text-slate-900">
+          <a href="/events/<%= event.id %>" class="hover:text-emerald-600 transition-colors">
+            <%= event.title %>
+          </a>
+        </h3>
+        
+        <!-- Description -->
+        <div class="flex-1 mb-4">
+          <p class="text-slate-600 line-clamp-3">
+            <%= event.short_description || event.description?.substring(0, 150) + '...' || 'Описание события' %>
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-auto">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center text-sm text-slate-500">
+              <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+              <span class="truncate"><%= event.address || event.location || 'Онлайн' %></span>
+            </div>
+            <div class="text-sm text-slate-500 ml-2 flex-shrink-0">
+              <%= event.org_name %>
+            </div>
+          </div>
+          <% if (event.slots_available !== undefined) { %>
+            <div class="text-sm text-slate-600 mb-4">Свободных мест: <%= event.slots_available %></div>
+          <% } %>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
+            <a href="/events/<%= event.id %>" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center py-2 px-4 rounded-md font-medium transition-colors">
+              Подробнее
+            </a>
+            <button class="favorite-btn px-4 py-2 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors" data-event-id="<%= event.id %>">
+              <i data-lucide="bookmark" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+<% } else { %>
+  <!-- Empty State -->
+  <div class="col-span-full text-center py-12">
+    <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <i data-lucide="calendar-x" class="w-12 h-12 text-slate-400"></i>
+    </div>
+    <h3 class="text-xl font-semibold text-slate-900 mb-2">События не найдены</h3>
+    <p class="text-slate-600 mb-6">Попробуйте изменить фильтры или создайте собственное мероприятие</p>
+    <a href="/org/register" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-medium transition-colors">
+      <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+      Создать мероприятие
+    </a>
+  </div>
+<% } %>
+
+<script>
+  // Re-initialize icons for dynamically loaded content
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+  document.querySelectorAll('.favorite-btn').forEach(btn => {
+    const id = Number(btn.dataset.eventId);
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if (favs.includes(id)) {
+      btn.classList.add('bg-emerald-50');
+    }
+    btn.addEventListener('click', () => {
+      let current = JSON.parse(localStorage.getItem('favorites') || '[]');
+      if (current.includes(id)) {
+        current = current.filter((v) => v !== id);
+        btn.classList.remove('bg-emerald-50');
+      } else {
+        current.push(id);
+        btn.classList.add('bg-emerald-50');
+      }
+      localStorage.setItem('favorites', JSON.stringify(current));
+    });
+  });
+</script>

@@ -1,0 +1,169 @@
+<% layout('layout', { title: 'Сертификаты - VolunteerHub' }) %>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Мои сертификаты</h1>
+        <p class="text-slate-600">Подтверждения участия в волонтёрских мероприятиях</p>
+      </div>
+      <a href="/account" class="text-slate-600 hover:text-slate-900 inline-flex items-center">
+        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+        К личному кабинету
+      </a>
+    </div>
+  </div>
+
+  <% if (it.completedEvents && it.completedEvents.length > 0) { %>
+    <!-- Certificates Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% it.completedEvents.forEach((event, index) => { %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+          <!-- Certificate Header -->
+          <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-6 text-white">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="award" class="w-8 h-8"></i>
+              </div>
+              <h3 class="text-lg font-semibold">Сертификат участия</h3>
+              <p class="text-emerald-100 text-sm">№ <%= String(index + 1).padStart(4, '0') %></p>
+            </div>
+          </div>
+
+          <!-- Certificate Content -->
+          <div class="p-6">
+            <div class="text-center mb-6">
+              <h4 class="text-xl font-semibold text-slate-900 mb-2"><%= event.event_title %></h4>
+              <p class="text-slate-600 mb-1">Роль: <%= event.role_title %></p>
+              <p class="text-sm text-slate-500">
+                <%= event.org_name %>
+              </p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-emerald-600">
+                  <%= Math.round(event.hours_worked || 0) %>
+                </div>
+                <div class="text-sm text-slate-600">часов</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600">
+                  <%= new Date(event.checkout_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) %>
+                </div>
+                <div class="text-sm text-slate-600">дата</div>
+              </div>
+            </div>
+
+            <!-- Badge -->
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
+                Подтверждено
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex space-x-3">
+              <button 
+                onclick="downloadCertificate('<%= event.id || index %>')"
+                class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Скачать PDF
+              </button>
+              <button 
+                onclick="shareCertificate('<%= event.id || index %>')"
+                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md text-sm font-medium transition-colors"
+              >
+                <i data-lucide="share-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="mt-12 bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-xl font-semibold text-slate-900 mb-6">Общая статистика</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-emerald-600 mb-2">
+            <%= it.completedEvents.length %>
+          </div>
+          <div class="text-slate-600">Завершённых событий</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600 mb-2">
+            <%= it.completedEvents.reduce((sum, e) => sum + (e.hours_worked || 0), 0) %>
+          </div>
+          <div class="text-slate-600">Волонтёрских часов</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600 mb-2">
+            <%= new Set(it.completedEvents.map(e => e.org_name)).size %>
+          </div>
+          <div class="text-slate-600">Организаций</div>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-3xl font-bold text-orange-600 mb-2">
+            <%= Math.round(it.completedEvents.reduce((sum, e) => sum + (e.hours_worked || 0), 0) / Math.max(it.completedEvents.length, 1)) %>
+          </div>
+          <div class="text-slate-600">Часов в среднем</div>
+        </div>
+      </div>
+    </div>
+
+  <% } else { %>
+    <!-- No Certificates -->
+    <div class="text-center py-16">
+      <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="award" class="w-12 h-12 text-slate-400"></i>
+      </div>
+      <h2 class="text-2xl font-semibold text-slate-900 mb-4">Пока нет сертификатов</h2>
+      <p class="text-slate-600 mb-8 max-w-md mx-auto">
+        Сертификаты появятся после участия в мероприятиях и подтверждения часов координатором.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/events" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+          <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+          Найти события
+        </a>
+        <a href="/account" class="inline-flex items-center px-6 py-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-medium transition-colors">
+          <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+          К профилю
+        </a>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+
+  function downloadCertificate(eventId) {
+    showToast('Скачивание PDF сертификата - в разработке', 'info');
+  }
+
+  function shareCertificate(eventId) {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Мой сертификат волонтёра',
+        text: 'Посмотрите мой сертификат участия в волонтёрском мероприятии!',
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('Ссылка скопирована в буфер обмена', 'success');
+      });
+    }
+  }
+</script>

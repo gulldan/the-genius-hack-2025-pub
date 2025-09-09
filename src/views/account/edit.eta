@@ -1,0 +1,274 @@
+<% layout('../layout', { title: 'Редактирование профиля - VolunteerHub' }) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900">Редактирование профиля</h1>
+        <p class="text-slate-600 mt-1">Обновите ваши личные данные и предпочтения</p>
+      </div>
+      <div class="flex space-x-4">
+        <a href="/account" class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+          Назад к профилю
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error/Success Messages -->
+  <% if (it.errors && it.errors.length > 0) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+      <div class="flex">
+        <i data-lucide="alert-circle" class="w-5 h-5 mr-2 mt-0.5"></i>
+        <div>
+          <strong>Ошибки валидации:</strong>
+          <ul class="mt-1 list-disc list-inside">
+            <% it.errors.forEach(error => { %>
+              <li><%= error %></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <% if (it.error) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+      <div class="flex">
+        <i data-lucide="x-circle" class="w-5 h-5 mr-2"></i>
+        <span><%= it.error %></span>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Main Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+    <form action="/account/edit" method="POST" class="space-y-8 p-8">
+      <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+
+      <!-- Basic Information -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Основная информация</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+              Полное имя *
+            </label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              value="<%= it.formData?.name || it.user.name || '' %>"
+              required
+              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="Иван Иванов"
+            >
+            <p class="text-xs text-slate-500 mt-1">Это имя будет отображаться другим пользователям</p>
+          </div>
+
+          <div>
+            <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">
+              Телефон
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              value="<%= it.formData?.phone || it.user.phone || '' %>"
+              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="+7 999 123 45 67"
+            >
+            <p class="text-xs text-slate-500 mt-1">Для связи организаторов и экстренных случаев</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email (readonly) -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Контактная информация</h3>
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+            Email адрес
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            value="<%= it.user.email %>"
+            readonly
+            disabled
+            class="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-50 text-slate-500"
+          >
+          <p class="text-xs text-slate-500 mt-1">Email нельзя изменить. Обратитесь в поддержку при необходимости.</p>
+        </div>
+      </div>
+
+      <!-- Languages -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Языки</h3>
+        <div class="space-y-2">
+          <p class="text-sm text-slate-600 mb-3">Выберите языки, на которых вы можете общаться (максимум 5)</p>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <% it.availableLanguages.forEach(language => { 
+              const isSelected = it.userLanguages.includes(language);
+            %>
+              <label class="flex items-center space-x-2 p-2 rounded-md hover:bg-slate-50 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  name="languages" 
+                  value="<%= language %>" 
+                  <%= isSelected ? 'checked' : '' %>
+                  class="text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded"
+                >
+                <span class="text-sm text-slate-700"><%= language %></span>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">О себе</h3>
+        <div>
+          <label for="bio" class="block text-sm font-medium text-slate-700 mb-2">
+            Биография
+          </label>
+          <textarea 
+            id="bio" 
+            name="bio" 
+            rows="4"
+            maxlength="500"
+            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="Расскажите немного о себе, своих интересах и мотивации для волонтерства..."
+          ><%= it.formData?.bio || it.user.bio || '' %></textarea>
+          <div class="flex justify-between items-center mt-1">
+            <p class="text-xs text-slate-500">Эта информация поможет организаторам лучше понять вас</p>
+            <span class="text-xs text-slate-400" id="bio-counter">0/500</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy Notice -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex">
+          <i data-lucide="shield" class="w-5 h-5 text-blue-600 mr-2 mt-0.5"></i>
+          <div class="text-sm text-blue-700">
+            <strong>Конфиденциальность:</strong> Ваши данные используются только для организации волонтерских мероприятий. 
+            Мы не передаем их третьим лицам без вашего согласия.
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-4 pt-6 border-t border-slate-200">
+        <a href="/account" class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-2 rounded-md font-medium transition-colors">
+          Отмена
+        </a>
+        <button 
+          type="submit" 
+          class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
+        >
+          Сохранить изменения
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Additional Actions -->
+  <div class="mt-8 bg-slate-50 rounded-xl p-6">
+    <h3 class="text-lg font-semibold text-slate-900 mb-4">Дополнительные действия</h3>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
+        <div>
+          <h4 class="font-medium text-slate-900">Загрузка документов</h4>
+          <p class="text-sm text-slate-600">Справки, сертификаты, документы об образовании</p>
+        </div>
+        <button 
+          onclick="showToast('Функция загрузки документов - в разработке', 'info')"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          Загрузить
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200">
+        <div>
+          <h4 class="font-medium text-slate-900">Экспорт данных</h4>
+          <p class="text-sm text-slate-600">Скачать копию всех ваших данных</p>
+        </div>
+        <button 
+          onclick="showToast('Функция экспорта данных - в разработке', 'info')"
+          class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          Экспортировать
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-red-200">
+        <div>
+          <h4 class="font-medium text-red-700">Удаление аккаунта</h4>
+          <p class="text-sm text-red-600">Навсегда удалить аккаунт и все связанные данные</p>
+        </div>
+        <button 
+          onclick="if(confirm('Вы уверены? Это действие нельзя отменить.')) { showToast('Функция удаления аккаунта - в разработке', 'info'); }"
+          class="border border-red-300 hover:bg-red-50 text-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          Удалить аккаунт
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Character counter for bio
+    const bioTextarea = document.getElementById('bio');
+    const bioCounter = document.getElementById('bio-counter');
+    
+    function updateCounter() {
+      const length = bioTextarea.value.length;
+      bioCounter.textContent = `${length}/500`;
+      
+      if (length > 450) {
+        bioCounter.classList.add('text-red-500');
+        bioCounter.classList.remove('text-slate-400');
+      } else {
+        bioCounter.classList.remove('text-red-500');
+        bioCounter.classList.add('text-slate-400');
+      }
+    }
+    
+    bioTextarea.addEventListener('input', updateCounter);
+    updateCounter(); // Initial update
+    
+    // Language selection limit
+    const languageCheckboxes = document.querySelectorAll('input[name="languages"]');
+    
+    function checkLanguageLimit() {
+      const selected = Array.from(languageCheckboxes).filter(cb => cb.checked);
+      
+      if (selected.length >= 5) {
+        languageCheckboxes.forEach(cb => {
+          if (!cb.checked) {
+            cb.disabled = true;
+          }
+        });
+      } else {
+        languageCheckboxes.forEach(cb => {
+          cb.disabled = false;
+        });
+      }
+    }
+    
+    languageCheckboxes.forEach(cb => {
+      cb.addEventListener('change', checkLanguageLimit);
+    });
+    
+    checkLanguageLimit(); // Initial check
+  });
+</script>

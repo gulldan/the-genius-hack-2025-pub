@@ -1,0 +1,408 @@
+<% layout('layout', { title: 'Личный кабинет - VolunteerHub' }) %>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Привет, <%= it.user.name %>!</h1>
+    <p class="text-slate-600">Добро пожаловать в ваш личный кабинет волонтёра</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="clock" class="w-6 h-6 text-emerald-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Всего часов</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.total_hours %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="check-circle" class="w-6 h-6 text-blue-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Завершено</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.completed_events %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="calendar" class="w-6 h-6 text-green-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Предстоящие</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.upcoming_events %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="clock" class="w-6 h-6 text-yellow-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">На рассмотрении</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.pending_applications %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Graph -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-4">График активности</h2>
+    <canvas id="activityChart" class="w-full h-48"></canvas>
+    <div class="mt-4 flex flex-wrap gap-2 items-center text-sm text-slate-700">
+      <span>Серия: <%= it.stats.streak %> дн.</span>
+      <% it.stats.badges.forEach(b => { %>
+        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full"><%= b %></span>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Upcoming Events -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-xl font-semibold text-slate-900">Ближайшие смены</h2>
+        </div>
+        <div class="p-6">
+          <% 
+            const upcomingApps = it.applications.filter(app => {
+              const eventDate = new Date(app.start_date);
+              return eventDate > new Date() && app.status === 'approved';
+            });
+          %>
+          
+          <% if (upcomingApps.length > 0) { %>
+            <div class="space-y-4">
+              <% upcomingApps.slice(0, 3).forEach(app => { %>
+                <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg">
+                  <div class="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="calendar" class="w-6 h-6 text-white"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-1"><%= app.event_title %></h3>
+                    <p class="text-slate-600 mb-2">Роль: <%= app.role_title %></p>
+                    <div class="flex items-center text-sm text-slate-500 space-x-4">
+                      <span class="flex items-center">
+                        <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+                        <%= new Date(app.start_date).toLocaleDateString('ru-RU') %>
+                      </span>
+                      <span class="flex items-center">
+                        <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                        <%= new Date(app.start_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'}) %> -
+                        <%= new Date(app.end_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'}) %>
+                      </span>
+                      <span class="flex items-center">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                        <%= app.address || 'Онлайн' %>
+                      </span>
+                    </div>
+                    <div class="text-sm text-slate-600 mt-2" data-countdown="<%= app.start_time %>"></div>
+                  </div>
+                  <div class="flex flex-col space-y-2">
+                    <a href="/checkin/qr/<%= app.id %>/<%= app.shift_id %>" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Чек-ин</a>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="text-center py-8">
+              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="calendar-x" class="w-8 h-8 text-slate-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">Нет предстоящих мероприятий</h3>
+              <p class="text-slate-600 mb-4">Найдите интересные возможности для волонтёрства</p>
+              <a href="/events" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-medium transition-colors">
+                <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                Найти события
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="px-6 py-4 border-b border-slate-200">
+          <h2 class="text-xl font-semibold text-slate-900">История участия</h2>
+        </div>
+        <div class="p-6">
+          <% if (it.applications && it.applications.length > 0) { %>
+            <div class="space-y-3">
+              <% it.applications.slice(0, 5).forEach(app => { %>
+                <div class="flex items-center justify-between py-3 border-b border-slate-100 last:border-b-0">
+                  <div class="flex-1">
+                    <h4 class="font-medium text-slate-900"><%= app.event_title %></h4>
+                    <p class="text-sm text-slate-600">
+                      <%= app.role_title %> • 
+                      <%= new Date(app.start_date).toLocaleDateString('ru-RU') %>
+                    </p>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <% if (app.hours_worked) { %>
+                      <span class="text-sm font-medium text-emerald-600">
+                        <%= app.hours_worked %> ч
+                      </span>
+                    <% } %>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium
+                      <% if (app.status === 'approved') { %>bg-green-100 text-green-800
+                      <% } else if (app.status === 'pending') { %>bg-yellow-100 text-yellow-800
+                      <% } else if (app.status === 'waitlisted') { %>bg-blue-100 text-blue-800
+                      <% } else { %>bg-slate-100 text-slate-800<% } %>">
+                      <% 
+                        const statusNames = {
+                          'new': 'Новая',
+                          'pending': 'На рассмотрении',
+                          'approved': 'Одобрена',
+                          'waitlisted': 'В очереди',
+                          'declined': 'Отклонена',
+                          'cancelled': 'Отменена'
+                        };
+                      %>
+                      <%= statusNames[app.status] || app.status %>
+                    </span>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+            
+            <% if (it.applications.length > 5) { %>
+              <div class="text-center mt-6">
+                <button class="text-emerald-600 hover:text-emerald-700 font-medium">
+                  Показать всю историю
+                </button>
+              </div>
+            <% } %>
+          <% } else { %>
+            <div class="text-center py-8">
+              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="file-text" class="w-8 h-8 text-slate-400"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">История пуста</h3>
+              <p class="text-slate-600">Участвуйте в мероприятиях, чтобы увидеть историю здесь</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Profile Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="text-center">
+          <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-emerald-600">
+              <%= it.user.name.split(' ').map(n => n[0]).join('').toUpperCase() %>
+            </span>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-1"><%= it.user.name %></h3>
+          <p class="text-slate-600 text-sm mb-4"><%= it.user.email %></p>
+          
+          <!-- Telegram Status -->
+          <% if (it.user.telegram_user_id) { %>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+              <div class="flex items-center justify-between text-sm text-green-700 mb-2">
+                <div class="flex items-center">
+                  <i data-lucide="smartphone" class="w-4 h-4 mr-1"></i>
+                  <span>Telegram подключён</span>
+                  <i data-lucide="check-circle" class="w-4 h-4 ml-1 text-green-600"></i>
+                </div>
+              </div>
+              <% if (it.user.telegram_username) { %>
+                <p class="text-xs text-green-600 mb-3">
+                  @<%= it.user.telegram_username %>
+                </p>
+              <% } %>
+              <div class="flex space-x-2">
+                <a 
+                  href="https://t.me/<%= it.botUsername || 'volunteerhub_bot' %>" 
+                  target="_blank"
+                  class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors text-center"
+                >
+                  Открыть бота
+                </a>
+                <form action="/account/telegram/disconnect" method="post" class="flex-1">
+                  <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+                  <button 
+                    type="submit"
+                    onclick="return confirm('Вы уверены, что хотите отключить Telegram?')"
+                    class="w-full border border-slate-300 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Отключить
+                  </button>
+                </form>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div class="flex items-center text-sm text-blue-700 mb-2">
+                <i data-lucide="smartphone" class="w-4 h-4 mr-1"></i>
+                <span>Подключите Telegram</span>
+                <span class="ml-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-medium rounded">
+                  NEW
+                </span>
+              </div>
+              <p class="text-xs text-blue-600 mb-3">
+                Получайте уведомления и быстро регистрируйтесь на события
+              </p>
+              <a 
+                href="/account/telegram/connect"
+                class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors text-center"
+              >
+                Подключить
+              </a>
+            </div>
+          <% } %>
+
+          <a href="/account/edit" class="w-full border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors text-center block">
+            Редактировать профиль
+          </a>
+          <a href="/account/notifications" class="mt-2 w-full border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors text-center block">
+            Настройки уведомлений
+          </a>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Навыки и интересы</h3>
+        <form action="/account/skills" method="post" class="space-y-2">
+          <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+          <% it.allSkills.forEach(skill => { const checked = it.userSkills.includes(skill); %>
+            <label class="flex items-center">
+              <input type="checkbox" name="skills" value="<%= skill %>" class="mr-2" <%= checked ? 'checked' : '' %>/>
+              <span class="text-sm text-slate-700"><%= skill %></span>
+            </label>
+          <% }) %>
+          <button type="submit" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Сохранить</button>
+        </form>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Быстрые действия</h3>
+        <div class="space-y-3">
+          <a href="/events" class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+            <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
+              <i data-lucide="search" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-slate-900">Найти события</p>
+              <p class="text-sm text-slate-600">Новые возможности</p>
+            </div>
+          </a>
+          
+          <a href="/my-qr" class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+              <i data-lucide="qr-code" class="w-5 h-5 text-blue-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-slate-900">Мой QR-код</p>
+              <p class="text-sm text-slate-600">Для быстрого чекина</p>
+            </div>
+          </a>
+          
+          <a href="/demo/geofencing" class="flex items-center p-3 rounded-lg hover:bg-orange-50 transition-colors border border-orange-200">
+            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+              <i data-lucide="map-pin" class="w-5 h-5 text-orange-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-orange-800">Геофенсинг</p>
+              <p class="text-sm text-orange-600">Демо проверки местоположения</p>
+            </div>
+          </a>
+          
+          <a href="/certificates" class="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+              <i data-lucide="award" class="w-5 h-5 text-purple-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-slate-900">Сертификаты</p>
+              <p class="text-sm text-slate-600">Подтверждения участия</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Handle URL parameters for notifications
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const success = urlParams.get('success');
+    
+    if (error) {
+      let errorMessage = 'Произошла ошибка';
+      if (error === 'telegram_auth_failed') {
+        errorMessage = 'Ошибка авторизации Telegram';
+      } else if (error === 'telegram_already_linked') {
+        errorMessage = 'Этот Telegram аккаунт уже привязан к другому пользователю';
+      }
+      showToast(errorMessage, 'error');
+    }
+    
+    if (success) {
+      let successMessage = 'Операция выполнена успешно';
+      if (success === 'telegram_connected') {
+        successMessage = 'Telegram успешно подключен!';
+      } else if (success === 'telegram_disconnected') {
+        successMessage = 'Telegram отключен от аккаунта';
+      } else if (success === 'profile_updated') {
+        successMessage = 'Профиль успешно обновлен!';
+      }
+      showToast(successMessage, 'success');
+    }
+
+    const ctx = document.getElementById('activityChart');
+    if (ctx && window.Chart) {
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: <%= JSON.stringify(it.activity.map(a => a.date)) %>,
+          datasets: [{
+            label: 'Часы',
+            data: <%= JSON.stringify(it.activity.map(a => a.hours)) %>,
+            backgroundColor: '#10b981'
+          }]
+        }
+      });
+    }
+
+    document.querySelectorAll('[data-countdown]').forEach(el => {
+      const start = new Date(el.dataset.start);
+      function update() {
+        const diff = start - new Date();
+        if (diff > 0) {
+          const m = Math.floor(diff / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          el.textContent = `До начала: ${m}м ${s}с`;
+        } else {
+          el.textContent = 'Идёт сейчас';
+        }
+      }
+      update();
+      setInterval(update, 1000);
+    });
+  });
+</script>

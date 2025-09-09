@@ -1,0 +1,397 @@
+<% 
+  const eventUrl = `https://volunteerhub.example.com/events/${it.event.id}`;
+  const eventImage = it.event.cover_url || 'https://volunteerhub.example.com/default-event.jpg';
+  const eventDescription = it.event.short_description || it.event.description || 'Волонтёрское мероприятие на платформе VolunteerHub';
+%>
+<% layout('layout', { 
+  title: `${it.event.title} - VolunteerHub`,
+  description: eventDescription,
+  ogTitle: it.event.title,
+  ogDescription: eventDescription,
+  ogImage: eventImage,
+  ogUrl: eventUrl,
+  ogType: 'event'
+}) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Event Header -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+    <!-- Cover Image -->
+    <% if (it.event.cover_url) { %>
+      <img src="<%= it.event.cover_url %>" alt="<%= it.event.title %>" class="w-full h-64 object-cover">
+    <% } else { %>
+      <div class="w-full h-64 bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+        <i data-lucide="heart-handshake" class="w-24 h-24 text-white"></i>
+      </div>
+    <% } %>
+    
+    <div class="p-8">
+      <!-- Event Meta -->
+      <div class="flex flex-wrap items-center gap-4 mb-6">
+        <div class="flex items-center text-slate-600">
+          <i data-lucide="calendar" class="w-5 h-5 mr-2"></i>
+          <%= it.event.start_date ? new Date(it.event.start_date).toLocaleDateString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : it.event.date %>
+        </div>
+        <div class="flex items-center text-slate-600">
+          <i data-lucide="map-pin" class="w-5 h-5 mr-2"></i>
+          <%= it.event.address || it.event.location || 'Онлайн' %>
+        </div>
+        <div class="flex items-center text-slate-600">
+          <i data-lucide="building" class="w-5 h-5 mr-2"></i>
+          <%= it.event.org_name %>
+        </div>
+        <% if (it.event.category) { %>
+          <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+            <%= it.event.category %>
+          </span>
+        <% } %>
+      </div>
+
+      <!-- Title and Description -->
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4"><%= it.event.title %></h1>
+      
+      <% if (it.event.short_description) { %>
+        <p class="text-xl text-slate-600 mb-6"><%= it.event.short_description %></p>
+      <% } %>
+      
+      <% if (it.event.long_description || it.event.description) { %>
+        <div class="prose prose-slate max-w-none">
+          <p><%= it.event.long_description || it.event.description %></p>
+        </div>
+      <% } %>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-8">
+        <button class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center justify-center">
+          <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
+          Записаться волонтёром
+        </button>
+        <button class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors inline-flex items-center justify-center">
+          <i data-lucide="share-2" class="w-5 h-5 mr-2"></i>
+          Поделиться
+        </button>
+        <button class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors inline-flex items-center justify-center">
+          <i data-lucide="bookmark" class="w-5 h-5 mr-2"></i>
+          Сохранить
+        </button>
+      </div>
+
+      <!-- Telegram Integration -->
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="flex items-start">
+          <i data-lucide="smartphone" class="w-5 h-5 text-blue-600 mt-0.5 mr-3"></i>
+          <div class="flex-1">
+            <h4 class="font-semibold text-blue-900 mb-1">Получайте уведомления в Telegram</h4>
+            <p class="text-blue-700 text-sm mb-3">
+              Подтверждения, напоминания и чекин прямо в мессенджере
+            </p>
+            <% if (it.tgLink) { %>
+              <a href="<%= it.tgLink %>" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Открыть в Telegram</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles and Shifts -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+    <h2 class="text-2xl font-bold text-slate-900 mb-6">Роли и смены</h2>
+    
+    <% if (it.roles && it.roles.length > 0) { %>
+      <div class="space-y-6">
+        <% it.roles.forEach(role => { %>
+          <div class="border border-slate-200 rounded-lg p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-semibold text-slate-900 mb-2"><%= role.title %></h3>
+                <% if (role.description) { %>
+                  <p class="text-slate-600 mb-3"><%= role.description %></p>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Requirements -->
+            <% if (role.required_skills || role.min_age || role.required_documents) { %>
+              <div class="mb-4">
+                <h4 class="font-semibold text-slate-700 mb-2">Требования:</h4>
+                <div class="flex flex-wrap gap-2">
+                  <% if (role.min_age) { %>
+                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-sm">
+                      Возраст: от <%= role.min_age %> лет
+                    </span>
+                  <% } %>
+                  <% if (role.required_skills) { %>
+                    <% try { const skills = JSON.parse(role.required_skills); skills.forEach(skill => { %>
+                      <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm"><%= skill %></span>
+                    <% }); } catch(e) {} %>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Shifts Table -->
+            <% if (role.shifts && role.shifts.length > 0) { %>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-slate-200">
+                      <th class="text-left py-3 px-4 font-semibold text-slate-700">Время</th>
+                      <th class="text-left py-3 px-4 font-semibold text-slate-700">Мест</th>
+                      <th class="text-left py-3 px-4 font-semibold text-slate-700">Статус</th>
+                      <th class="text-right py-3 px-4 font-semibold text-slate-700">Действие</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% role.shifts.forEach(shift => { %>
+                      <% 
+                        // Получаем количество одобренных и ожидающих заявок
+                        const approved = shift.approved_count || 0;
+                        const waitlisted = shift.waitlisted_count || 0;
+                        const capacity = shift.capacity || 1;
+                        const hasSpots = approved < capacity;
+                        const statusText = hasSpots ? 'Есть места' : 'Лист ожидания';
+                        const statusClass = hasSpots ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                        const buttonText = hasSpots ? 'Записаться' : 'В очередь';
+                        const buttonClass = hasSpots ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-yellow-600 hover:bg-yellow-700';
+                      %>
+                      <tr class="border-b border-slate-100">
+                        <td class="py-3 px-4 text-slate-900">
+                          <%= new Date(shift.start_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'}) %> - 
+                          <%= new Date(shift.end_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'}) %>
+                        </td>
+                        <td class="py-3 px-4 text-slate-600">
+                          <span class="font-medium"><%= approved %></span> из <span class="text-slate-500"><%= capacity %></span>
+                          <% if (waitlisted > 0) { %>
+                            <div class="text-xs text-yellow-600 mt-1">
+                              +<%= waitlisted %> в очереди
+                            </div>
+                          <% } %>
+                        </td>
+                        <td class="py-3 px-4">
+                          <span class="px-2 py-1 <%= statusClass %> rounded-full text-xs font-medium">
+                            <%= statusText %>
+                          </span>
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                          <button 
+                            class="<%= buttonClass %> text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                            onclick="openSignupModal('<%= role.id %>', '<%= shift.id %>')"
+                          >
+                            <%= buttonText %>
+                          </button>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="text-center py-6">
+                <div class="text-slate-400 mb-2">
+                  <i data-lucide="clock" class="w-8 h-8 mx-auto"></i>
+                </div>
+                <p class="text-slate-600">Смены для этой роли пока не добавлены</p>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-8">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="users" class="w-8 h-8 text-slate-400"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">Роли пока не добавлены</h3>
+        <p class="text-slate-600">Организатор скоро опубликует доступные роли</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Event Details -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Location -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+        <i data-lucide="map-pin" class="w-5 h-5 mr-2"></i>
+        Место проведения
+      </h3>
+      <div class="space-y-2">
+        <p class="text-slate-600"><%= it.event.address || it.event.location || 'Онлайн мероприятие' %></p>
+        <% if (it.event.address) { %>
+          <button class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+            Показать на карте
+          </button>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Organization -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h3 class="text-xl font-semibold text-slate-900 mb-4 flex items-center">
+        <i data-lucide="building" class="w-5 h-5 mr-2"></i>
+        Организатор
+      </h3>
+      <div class="space-y-2">
+        <p class="font-medium text-slate-900"><%= it.event.org_name %></p>
+        <p class="text-slate-600 text-sm">Проверенная организация</p>
+        <button class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+          Посмотреть профиль
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Signup Modal -->
+<div id="signup-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl max-w-md w-full p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold">Записаться на мероприятие</h3>
+      <button onclick="closeSignupModal()" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    
+    <form id="signup-form" method="post" action="/applications" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+      <input type="hidden" name="event_id" value="<%= it.event.id %>">
+      <input type="hidden" name="role_id" id="modal-role-id">
+      <input type="hidden" name="shift_id" id="modal-shift-id">
+      <input type="hidden" name="force_waitlist" id="modal-force-waitlist" value="false">
+      
+      <!-- Shift Status Info -->
+      <div id="shift-status-info" class="mb-4 p-3 rounded-lg border hidden">
+        <div class="flex items-center">
+          <i data-lucide="info" class="w-5 h-5 mr-2"></i>
+          <div>
+            <p class="font-medium" id="shift-status-text"></p>
+            <p class="text-sm text-slate-600" id="shift-status-details"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Имя</label>
+          <input type="text" name="name" required class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
+          <input type="email" name="email" required class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Телефон</label>
+          <input type="tel" name="phone" class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Возраст</label>
+          <input type="number" name="age" class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Комментарий</label>
+          <textarea name="comment" rows="3" class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500" placeholder="Расскажите о своём опыте или мотивации..."></textarea>
+        </div>
+
+        <% if (it.event.custom_questions && it.event.custom_questions.length > 0) { %>
+          <% it.event.custom_questions.forEach((q, idx) => { %>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2"><%= q.label %></label>
+              <% if (q.type === 'file') { %>
+                <input type="file" name="question_<%= idx %>" class="w-full">
+              <% } else if (q.type === 'textarea') { %>
+                <textarea name="question_<%= idx %>" rows="3" class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500"></textarea>
+              <% } else { %>
+                <input type="text" name="question_<%= idx %>" class="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-emerald-500">
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+      
+      <div class="flex gap-3 mt-6">
+        <button type="button" onclick="closeSignupModal()" class="flex-1 px-4 py-3 border border-slate-300 rounded-md hover:bg-slate-50 font-medium transition-colors">
+          Отмена
+        </button>
+        <button type="submit" id="submit-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-md font-medium transition-colors">
+          Записаться
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    trackEvent('event_viewed', { event_id: <%= it.event.id %> });
+  });
+
+  function openSignupModal(roleId, shiftId) {
+    // Находим информацию о смене
+    const roles = <%- JSON.stringify(it.roles || []) %>;
+    const role = roles.find(r => r.id == roleId);
+    const shift = role?.shifts?.find(s => s.id == shiftId);
+    
+    document.getElementById('modal-role-id').value = roleId;
+    document.getElementById('modal-shift-id').value = shiftId;
+    
+    // Обновляем информацию о статусе смены
+    const statusInfo = document.getElementById('shift-status-info');
+    const statusText = document.getElementById('shift-status-text');
+    const statusDetails = document.getElementById('shift-status-details');
+    const submitBtn = document.getElementById('submit-btn');
+    const forceWaitlistInput = document.getElementById('modal-force-waitlist');
+    
+    if (shift) {
+      const approved = shift.approved_count || 0;
+      const waitlisted = shift.waitlisted_count || 0;
+      const capacity = shift.capacity || 1;
+      const hasSpots = approved < capacity;
+      
+      statusInfo.classList.remove('hidden');
+      
+      if (hasSpots) {
+        statusInfo.className = 'mb-4 p-3 rounded-lg border bg-green-50 border-green-200';
+        statusText.textContent = 'Есть свободные места';
+        statusDetails.textContent = `Занято ${approved} из ${capacity} мест`;
+        submitBtn.textContent = 'Записаться';
+        submitBtn.className = 'flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-md font-medium transition-colors';
+        forceWaitlistInput.value = 'false';
+      } else {
+        statusInfo.className = 'mb-4 p-3 rounded-lg border bg-yellow-50 border-yellow-200';
+        statusText.textContent = 'Нет свободных мест';
+        const waitlistText = waitlisted > 0 ? `, ${waitlisted} человек в очереди` : '';
+        statusDetails.textContent = `Смена заполнена (${approved}/${capacity})${waitlistText}. Вы будете добавлены в лист ожидания.`;
+        submitBtn.textContent = 'Встать в очередь';
+        submitBtn.className = 'flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded-md font-medium transition-colors';
+        forceWaitlistInput.value = 'true';
+      }
+    } else {
+      statusInfo.classList.add('hidden');
+      forceWaitlistInput.value = 'false';
+    }
+    
+    document.getElementById('signup-modal').classList.remove('hidden');
+    trackEvent('signup_opened', { event_id: <%= it.event.id %>, role_id: roleId, shift_id: shiftId });
+  }
+
+  function closeSignupModal() {
+    document.getElementById('signup-modal').classList.add('hidden');
+  }
+
+  // Close modal on outside click
+  document.getElementById('signup-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeSignupModal();
+    }
+  });
+
+  document.getElementById('signup-form').addEventListener('submit', function() {
+    trackEvent('signup_submitted', { event_id: <%= it.event.id %> });
+  });
+</script>

@@ -1,0 +1,27 @@
+{
+	"name": "volunteer-platform",
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run src/server.ts",
+		"seed": "bun run scripts/seed.ts",
+		"build:css": "bunx tailwindcss -i styles/tailwind.css -o public/style.css",
+		"dev:css": "bunx tailwindcss -i styles/tailwind.css -o public/style.css --watch",
+		"dev:server": "PORT=${PORT:-3000} bun run src/server.ts",
+		"dev:all": "concurrently -n css,server -c blue,green \"bun run dev:css\" \"bun run dev:server\"",
+		"lint": "bunx biome check src scripts styles docs README.md package.json biome.json"
+	},
+	"dependencies": {
+		"elysia": "^1.3.20",
+		"eta": "^3.5.0",
+		"qrcode": "^1.5.4"
+	},
+	"devDependencies": {
+		"tailwindcss": "^4.1.12",
+		"@marp-team/marp-cli": "^4.2.3",
+		"@biomejs/biome": "^2.2.2",
+		"bun-types": "^1.2.21",
+		"concurrently": "^9.2.1",
+		"@types/node": "^24.3.0"
+	}
+}

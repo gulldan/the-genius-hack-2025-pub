@@ -1,0 +1,194 @@
+<% layout('../layout', { title: `Роли - ${it.event.title} - KvadricepsHub` }) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Progress Bar -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-3xl font-bold text-slate-900">Настройка ролей</h1>
+      <nav class="text-sm text-slate-600">
+        <a href="/org/<%= it.event.org_id %>/events" class="hover:text-slate-900">События</a>
+        <span class="mx-2">›</span>
+        <span><%= it.event.title %></span>
+      </nav>
+    </div>
+    
+    <div class="bg-white rounded-lg p-4 border border-slate-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-slate-900">Шаг 2 из 8</span>
+        <span class="text-sm text-slate-600">Роли волонтёров</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-2">
+        <div class="bg-emerald-600 h-2 rounded-full" style="width: 25%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Role Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-6">Добавить новую роль</h2>
+    
+    <form method="post" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Название роли *
+          </label>
+          <input 
+            type="text" 
+            name="title" 
+            required 
+            placeholder="Например: Уход за собаками"
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Описание роли
+          </label>
+          <textarea 
+            name="description" 
+            rows="3"
+            placeholder="Что будет делать волонтёр в этой роли..."
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Минимальный возраст
+          </label>
+          <input 
+            type="number" 
+            name="min_age" 
+            min="12"
+            max="100"
+            placeholder="16"
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Необходимые навыки
+          </label>
+          <input 
+            type="text" 
+            name="required_skills" 
+            placeholder="Любовь к животным, физическая активность"
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+          <p class="text-xs text-slate-500 mt-1">Через запятую</p>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Необходимые документы
+          </label>
+          <input 
+            type="text" 
+            name="required_documents" 
+            placeholder="Справка о прививках, медицинская книжка"
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+          <p class="text-xs text-slate-500 mt-1">Через запятую</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button 
+          type="submit" 
+          class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+        >
+          Добавить роль
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Existing Roles -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-6">
+      Добавленные роли (<%= it.roles.length %>)
+    </h2>
+    
+    <% if (it.roles && it.roles.length > 0) { %>
+      <div class="space-y-4">
+        <% it.roles.forEach(role => { %>
+          <div class="border border-slate-200 rounded-lg p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= role.title %></h3>
+                <% if (role.description) { %>
+                  <p class="text-slate-600 mb-3"><%= role.description %></p>
+                <% } %>
+                
+                <!-- Requirements -->
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <% if (role.min_age) { %>
+                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-sm">
+                      Возраст: от <%= role.min_age %> лет
+                    </span>
+                  <% } %>
+                  <% if (role.required_skills) { %>
+                    <% try { const skills = JSON.parse(role.required_skills); skills.forEach(skill => { %>
+                      <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm"><%= skill %></span>
+                    <% }); } catch(e) {} %>
+                  <% } %>
+                  <% if (role.required_documents) { %>
+                    <% try { const docs = JSON.parse(role.required_documents); docs.forEach(doc => { %>
+                      <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-sm"><%= doc %></span>
+                    <% }); } catch(e) {} %>
+                  <% } %>
+                </div>
+              </div>
+              
+              <div class="flex space-x-2">
+                <a 
+                  href="/org/<%= it.event.org_id %>/events/<%= it.event.id %>/roles/<%= role.id %>/shifts" 
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+                >
+                  Настроить смены
+                </a>
+                <button class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded text-sm font-medium transition-colors">
+                  Редактировать
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-12 border-2 border-dashed border-slate-300 rounded-lg">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="user-plus" class="w-8 h-8 text-slate-400"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">Добавьте первую роль</h3>
+        <p class="text-slate-600">Определите, какие роли нужны для вашего события</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex justify-between">
+    <a href="/org/<%= it.event.org_id %>/events/new" class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 font-medium transition-colors">
+      ← Назад
+    </a>
+    
+    <% if (it.roles && it.roles.length > 0) { %>
+      <a href="/org/<%= it.event.org_id %>/events/<%= it.event.id %>/publish" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+        Далее: Публикация →
+      </a>
+    <% } else { %>
+      <button class="px-6 py-3 bg-slate-400 text-white rounded-lg font-medium cursor-not-allowed" disabled>
+        Добавьте хотя бы одну роль
+      </button>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+</script>

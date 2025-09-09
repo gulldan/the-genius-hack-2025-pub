@@ -1,0 +1,214 @@
+<% layout('layout', { title: 'Помощь - VolunteerHub' }) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="text-center mb-12">
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+      Центр помощи
+    </h1>
+    <p class="text-xl text-slate-600">
+      Ответы на часто задаваемые вопросы и руководства
+    </p>
+  </div>
+
+  <!-- Quick Help -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center">
+      <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="users" class="w-8 h-8 text-emerald-600"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Для волонтёров</h3>
+      <p class="text-slate-600 mb-4">Как найти события, записаться и участвовать</p>
+      <a href="#volunteers" class="text-emerald-600 hover:text-emerald-700 font-medium">
+        Подробнее →
+      </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="building" class="w-8 h-8 text-blue-600"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Для организаций</h3>
+      <p class="text-slate-600 mb-4">Как создавать события и управлять волонтёрами</p>
+      <a href="#organizations" class="text-blue-600 hover:text-blue-700 font-medium">
+        Подробнее →
+      </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center">
+      <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="smartphone" class="w-8 h-8 text-purple-600"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">Telegram</h3>
+      <p class="text-slate-600 mb-4">Как подключить и использовать Telegram</p>
+      <a href="#telegram" class="text-purple-600 hover:text-purple-700 font-medium">
+        Подробнее →
+      </a>
+    </div>
+  </div>
+
+  <!-- FAQ Sections -->
+  <div class="space-y-12">
+    <!-- For Volunteers -->
+    <section id="volunteers" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+        <i data-lucide="users" class="w-6 h-6 mr-3 text-emerald-600"></i>
+        Для волонтёров
+      </h2>
+      
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как найти подходящее мероприятие?</h3>
+          <p class="text-slate-600">
+            Используйте <a href="/events" class="text-emerald-600 hover:text-emerald-700">каталог событий</a> 
+            с фильтрами по дате, местоположению, категории и продолжительности. 
+            Каждое событие содержит подробное описание ролей и требований.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как записаться на мероприятие?</h3>
+          <p class="text-slate-600">
+            На странице события выберите подходящую роль и смену, затем нажмите "Записаться". 
+            Заполните форму заявки - организатор рассмотрит её и отправит подтверждение.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как происходит чекин на мероприятии?</h3>
+          <p class="text-slate-600">
+            Есть три способа: показать свой QR-код координатору, зарегистрироваться через киоск 
+            самообслуживания или подтвердить участие в Telegram боте.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Где посмотреть свои волонтёрские часы?</h3>
+          <p class="text-slate-600">
+            В <a href="/account" class="text-emerald-600 hover:text-emerald-700">личном кабинете</a> 
+            отображается статистика: общее количество часов, завершённые события, предстоящие мероприятия.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- For Organizations -->
+    <section id="organizations" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+        <i data-lucide="building" class="w-6 h-6 mr-3 text-blue-600"></i>
+        Для организаций
+      </h2>
+      
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как создать мероприятие?</h3>
+          <p class="text-slate-600">
+            После регистрации организации используйте пошаговый мастер создания события: 
+            основная информация → роли → смены → настройки → публикация. 
+            Каждый шаг содержит подсказки и рекомендации.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как управлять заявками волонтёров?</h3>
+          <p class="text-slate-600">
+            В дашборде организации есть раздел "Заявки" где можно просматривать, одобрять или отклонять 
+            заявки. Поддерживается массовая обработка и фильтрация по статусам и событиям.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как происходит чекин волонтёров?</h3>
+          <p class="text-slate-600">
+            Координаторы могут использовать QR-сканер для быстрой регистрации, 
+            киоск самообслуживания для волонтёров или панель управления для ручного чекина.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Где посмотреть отчёты и аналитику?</h3>
+          <p class="text-slate-600">
+            В разделе "Отчёты" доступна подробная аналитика: статистика событий, 
+            конверсия заявок, топ волонтёры, экспорт данных в CSV формате.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Telegram Integration -->
+    <section id="telegram" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+        <i data-lucide="smartphone" class="w-6 h-6 mr-3 text-purple-600"></i>
+        Интеграция с Telegram
+        <span class="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+          TODO
+        </span>
+      </h2>
+      
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как подключить Telegram?</h3>
+          <p class="text-slate-600">
+            На странице входа или в личном кабинете нажмите "Подключить Telegram". 
+            Это позволит получать уведомления и быстро взаимодействовать с платформой.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Какие уведомления приходят в Telegram?</h3>
+          <p class="text-slate-600">
+            Подтверждения заявок, напоминания о мероприятиях, запросы на чекин/чекаут, 
+            изменения в расписании, экстренные уведомления от организаторов.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Как использовать чекин через Telegram?</h3>
+          <p class="text-slate-600">
+            В день мероприятия бот отправит сообщение с кнопкой "Чекин". 
+            Нажмите её и подтвердите своё местоположение (если требуется).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Support -->
+    <section class="bg-emerald-50 border border-emerald-200 rounded-xl p-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">Не нашли ответ?</h2>
+        <p class="text-slate-600 mb-6">Свяжитесь с нашей службой поддержки</p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="mailto:support@volunteerhub.ru" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+            <i data-lucide="mail" class="w-5 h-5 mr-2"></i>
+            support@volunteerhub.ru
+          </a>
+          <a href="tel:+78001234567" class="inline-flex items-center px-6 py-3 border border-emerald-600 text-emerald-600 hover:bg-emerald-50 rounded-lg font-medium transition-colors">
+            <i data-lucide="phone" class="w-5 h-5 mr-2"></i>
+            8 (800) 123-45-67
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  });
+</script>

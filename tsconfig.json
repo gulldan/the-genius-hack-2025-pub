@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "esnext",
+		"moduleResolution": "bundler",
+		"types": ["bun-types", "node"],
+		"skipLibCheck": true,
+		"allowJs": true,
+		"allowImportingTsExtensions": true,
+		"strict": true
+	},
+	"include": ["src", "scripts", "README.md", "docs", "styles", "package.json"],
+	"exclude": ["node_modules", "dist"]
+}

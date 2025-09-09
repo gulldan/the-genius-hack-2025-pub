@@ -1,0 +1,325 @@
+<% layout('../layout', { title: 'Панель координатора - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900">Панель координатора</h1>
+        <p class="text-slate-600 mt-1">Управление волонтерскими мероприятиями и командами</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button 
+          id="refresh-stats"
+          class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+        >
+          <i data-lucide="refresh-cw" class="w-4 h-4 mr-2 inline"></i>
+          Обновить
+        </button>
+        <a href="/coordinator/events" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors">
+          <i data-lucide="calendar" class="w-4 h-4 mr-2 inline"></i>
+          Все события
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" id="quick-stats">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="calendar-check" class="w-6 h-6 text-blue-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Активные события</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.active_events %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="users" class="w-6 h-6 text-emerald-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Волонтеры (30 дней)</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.total_volunteers %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="clock" class="w-6 h-6 text-orange-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">События сегодня</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.today_events %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="alert-circle" class="w-6 h-6 text-red-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Ожидают чекин</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.pending_checkins %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Active Events -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-xl font-semibold text-slate-900">Активные события</h2>
+      </div>
+      <div class="p-6">
+        <% if (it.activeEvents && it.activeEvents.length > 0) { %>
+          <div class="space-y-4">
+            <% it.activeEvents.slice(0, 5).forEach(event => { %>
+              <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-slate-900 mb-1"><%= event.title %></h3>
+                    <p class="text-sm text-slate-600 mb-2"><%= event.org_name %></p>
+                    <div class="flex items-center text-sm text-slate-500 space-x-4">
+                      <span>
+                        <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                        <%= new Date(event.start_date).toLocaleDateString('ru-RU') %>
+                      </span>
+                      <span>
+                        <i data-lucide="users" class="w-4 h-4 inline mr-1"></i>
+                        <%= event.approved_applications || 0 %> участников
+                      </span>
+                      <% if (event.checked_in_count > 0) { %>
+                        <span class="text-emerald-600">
+                          <i data-lucide="check-circle" class="w-4 h-4 inline mr-1"></i>
+                          <%= event.checked_in_count %> на месте
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="flex flex-col space-y-2 ml-4">
+                    <a href="/events/<%= event.id %>/live" 
+                       class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                      Live панель
+                    </a>
+                    <button onclick="showEventActions(<%= event.id %>, '<%= event.title %>')"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded text-sm font-medium transition-colors">
+                      Действия
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+          
+          <% if (it.activeEvents.length > 5) { %>
+            <div class="text-center mt-6">
+              <a href="/coordinator/events" class="text-emerald-600 hover:text-emerald-700 font-medium">
+                Показать все события (<%= it.activeEvents.length %>)
+              </a>
+            </div>
+          <% } %>
+        <% } else { %>
+          <div class="text-center py-8">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="calendar-x" class="w-8 h-8 text-slate-400"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Нет активных событий</h3>
+            <p class="text-slate-600">В ближайшее время запланированных событий нет</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Recent Incidents -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-xl font-semibold text-slate-900">Недавние инциденты</h2>
+      </div>
+      <div class="p-6">
+        <% if (it.recentIncidents && it.recentIncidents.length > 0) { %>
+          <div class="space-y-4">
+            <% it.recentIncidents.forEach(incident => { %>
+              <div class="border-l-4 border-red-400 bg-red-50 p-4 rounded-r-lg">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p class="font-medium text-red-800">
+                      <% 
+                        const incidentTypes = {
+                          'late': 'Опоздание',
+                          'injury': 'Травма',
+                          'equipment': 'Оборудование',
+                          'conflict': 'Конфликт',
+                          'other': 'Другое'
+                        };
+                      %>
+                      <%= incidentTypes[incident.type] || incident.type %>
+                    </p>
+                    <p class="text-sm text-red-700 mb-1"><%= incident.event_title %></p>
+                    <% if (incident.note) { %>
+                      <p class="text-sm text-red-600"><%= incident.note %></p>
+                    <% } %>
+                    <p class="text-xs text-red-500 mt-2">
+                      <%= new Date(incident.created_at).toLocaleString('ru-RU') %>
+                      <% if (incident.user_name) { %>
+                        • <%= incident.user_name %>
+                      <% } %>
+                    </p>
+                  </div>
+                  <button onclick="resolveIncident(<%= incident.id %>)"
+                          class="text-red-600 hover:text-red-800 text-sm">
+                    Решено
+                  </button>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-8">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="shield-check" class="w-8 h-8 text-green-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Нет инцидентов</h3>
+            <p class="text-slate-600">Все мероприятия проходят без происшествий</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Actions Modal -->
+<div id="event-actions-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl max-w-md w-full p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold" id="modal-event-title">Действия с событием</h3>
+      <button onclick="closeEventActionsModal()" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    
+    <div class="space-y-4">
+      <button onclick="broadcastMessage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="megaphone" class="w-5 h-5 mr-3 inline"></i>
+        Отправить уведомление
+      </button>
+      
+      <button onclick="exportVolunteers()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="download" class="w-5 h-5 mr-3 inline"></i>
+        Экспортировать список
+      </button>
+      
+      <button onclick="viewAnalytics()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3 inline"></i>
+        Аналитика события
+      </button>
+      
+      <button onclick="closeEvent()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="x-circle" class="w-5 h-5 mr-3 inline"></i>
+        Закрыть событие
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentEventId = null;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Автообновление статистики каждые 30 секунд
+    setInterval(refreshQuickStats, 30000);
+  });
+
+  function refreshQuickStats() {
+    fetch('/coordinator/api/quick-stats')
+      .then(response => response.json())
+      .then(data => {
+        // Обновляем счетчики (в реальном приложении)
+        console.log('Updated stats:', data);
+      })
+      .catch(error => console.error('Error refreshing stats:', error));
+  }
+
+  function showEventActions(eventId, eventTitle) {
+    currentEventId = eventId;
+    document.getElementById('modal-event-title').textContent = eventTitle;
+    document.getElementById('event-actions-modal').classList.remove('hidden');
+  }
+
+  function closeEventActionsModal() {
+    currentEventId = null;
+    document.getElementById('event-actions-modal').classList.add('hidden');
+  }
+
+  function broadcastMessage() {
+    showToast('Функция отправки уведомлений - в разработке', 'info');
+    closeEventActionsModal();
+  }
+
+  function exportVolunteers() {
+    if (currentEventId) {
+      window.open(`/org/1/events/${currentEventId}/export`, '_blank');
+    }
+    closeEventActionsModal();
+  }
+
+  function viewAnalytics() {
+    if (currentEventId) {
+      window.location.href = `/org/1/events/${currentEventId}/view`;
+    }
+    closeEventActionsModal();
+  }
+
+  function closeEvent() {
+    if (currentEventId && confirm('Вы уверены, что хотите закрыть событие?')) {
+      fetch(`/coordinator/events/${currentEventId}/close`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Событие закрыто', 'success');
+          setTimeout(() => location.reload(), 1000);
+        }
+      })
+      .catch(error => {
+        showToast('Ошибка при закрытии события', 'error');
+      });
+    }
+    closeEventActionsModal();
+  }
+
+  function resolveIncident(incidentId) {
+    // В реальном приложении здесь была бы отметка инцидента как решенного
+    showToast('Инцидент отмечен как решенный', 'success');
+  }
+
+  document.getElementById('refresh-stats').addEventListener('click', function() {
+    this.disabled = true;
+    this.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 mr-2 inline animate-spin"></i>Обновление...';
+    
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+  });
+
+  // Close modal on outside click
+  document.getElementById('event-actions-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeEventActionsModal();
+    }
+  });
+</script>

@@ -1,0 +1,106 @@
+<% layout('layout', { title: 'Подключить Telegram - VolunteerHub' }) %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="smartphone" class="w-10 h-10 text-blue-600"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">Подключить Telegram</h1>
+      <p class="text-slate-600">
+        Получайте уведомления и управляйте участием в мероприятиях прямо в Telegram
+      </p>
+    </div>
+
+    <div class="space-y-6 mb-8">
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+        <h3 class="font-semibold text-emerald-800 mb-2">✅ Что вы получите:</h3>
+        <ul class="text-sm text-emerald-700 space-y-1">
+          <li>• Мгновенные уведомления о новых событиях</li>
+          <li>• Напоминания перед началом смен</li>
+          <li>• Быстрый чек-ин через геолокацию</li>
+          <li>• Подтверждение участия прямо в чате</li>
+          <li>• Управление заявками без входа на сайт</li>
+        </ul>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="font-semibold text-blue-800 mb-2">🔒 Безопасность:</h3>
+        <ul class="text-sm text-blue-700 space-y-1">
+          <li>• Мы не получаем доступ к вашим сообщениям</li>
+          <li>• Только основная информация профиля (имя, username)</li>
+          <li>• Вы можете отключить уведомления в любой момент</li>
+          <li>• Данные защищены шифрованием Telegram</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-lg p-6 mb-6">
+      <h3 class="font-semibold text-slate-900 mb-4">Шаг 1: Подключение аккаунта</h3>
+      <p class="text-sm text-slate-600 mb-4">
+        Нажмите кнопку ниже, чтобы авторизоваться через Telegram и связать ваш аккаунт:
+      </p>
+      
+      <div id="telegram-login-container" class="flex justify-center">
+        <%- it.telegramWidget %>
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-lg p-6">
+      <h3 class="font-semibold text-slate-900 mb-4">Шаг 2: Настройка бота</h3>
+      <p class="text-sm text-slate-600 mb-4">
+        После подключения найдите нашего бота в Telegram и запустите его:
+      </p>
+      
+      <div class="flex items-center justify-between bg-slate-50 rounded-lg p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+            <i data-lucide="bot" class="w-6 h-6 text-white"></i>
+          </div>
+          <div>
+            <p class="font-medium text-slate-900">@<%= it.botUsername %></p>
+            <p class="text-sm text-slate-600">VolunteerHub Bot</p>
+          </div>
+        </div>
+        <a 
+          href="https://t.me/<%= it.botUsername %>" 
+          target="_blank"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+        >
+          Открыть в Telegram
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-center">
+      <a 
+        href="/account" 
+        class="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
+      >
+        ← Вернуться в личный кабинет
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Проверяем параметры URL для отображения сообщений
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const success = urlParams.get('success');
+    
+    if (error === 'telegram_auth_failed') {
+      showToast('Ошибка авторизации Telegram. Попробуйте еще раз.', 'error');
+    } else if (error === 'telegram_already_linked') {
+      showToast('Этот Telegram аккаунт уже привязан к другому пользователю.', 'error');
+    } else if (success === 'telegram_connected') {
+      showToast('Telegram успешно подключен!', 'success');
+      setTimeout(() => {
+        window.location.href = '/account';
+      }, 2000);
+    }
+  });
+</script>

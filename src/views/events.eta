@@ -1,0 +1,224 @@
+<% layout('layout', { title: 'Каталог событий - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Каталог событий</h1>
+      <p class="text-xl text-slate-600">Найдите волонтёрские возможности рядом с вами</p>
+    </div>
+    <% if (it.tgLink) { %>
+      <a href="<%= it.tgLink %>" class="ml-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">Открыть в Telegram</a>
+    <% } %>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8" x-data="{ filtersOpen: false }">
+    <!-- Search Bar -->
+    <div class="flex flex-col md:flex-row gap-4 mb-4">
+      <div class="flex-1">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+          <input
+            type="text"
+            placeholder="Поиск событий..."
+            class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            hx-get="/events/search"
+            hx-trigger="input changed delay:300ms"
+            hx-target="#events-grid"
+            hx-include="[data-filter]"
+            name="q"
+          >
+        </div>
+      </div>
+      <button
+        @click="filtersOpen = !filtersOpen"
+        class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center gap-2 font-medium"
+      >
+        <i data-lucide="filter" class="w-5 h-5"></i>
+        Фильтры
+        <i data-lucide="chevron-down" class="w-4 h-4" x-bind:class="{ 'rotate-180': filtersOpen }"></i>
+      </button>
+      <select data-filter name="sort" class="p-3 border border-slate-300 rounded-lg">
+        <option value="date">По дате</option>
+        <option value="new">По новизне</option>
+        <option value="popular">По популярности</option>
+      </select>
+      <button id="save-search" class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 font-medium">
+        Сохранить поиск
+      </button>
+    </div>
+
+    <div id="saved-searches" class="flex flex-wrap gap-2 mb-4"></div>
+
+    <!-- Advanced Filters -->
+    <div x-show="filtersOpen" x-transition class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-200">
+      <!-- Date Range -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Дата</label>
+        <select data-filter name="date_range" class="w-full p-2 border border-slate-300 rounded-md">
+          <option value="">Любая дата</option>
+          <option value="today">Сегодня</option>
+          <option value="tomorrow">Завтра</option>
+          <option value="this_week">На этой неделе</option>
+          <option value="this_month">В этом месяце</option>
+        </select>
+      </div>
+
+      <!-- Location -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Местоположение</label>
+        <select data-filter name="location" class="w-full p-2 border border-slate-300 rounded-md">
+          <option value="">Любое место</option>
+          <option value="online">Онлайн</option>
+          <option value="moscow">Москва</option>
+          <option value="spb">Санкт-Петербург</option>
+          <option value="other">Другой город</option>
+        </select>
+        <input type="hidden" data-filter name="lat">
+        <input type="hidden" data-filter name="lon">
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Категория</label>
+        <select data-filter name="category" class="w-full p-2 border border-slate-300 rounded-md">
+          <option value="">Все категории</option>
+          <option value="environment">Экология</option>
+          <option value="social">Социальная помощь</option>
+          <option value="education">Образование</option>
+          <option value="health">Здравоохранение</option>
+          <option value="animals">Помощь животным</option>
+          <option value="culture">Культура и искусство</option>
+          <option value="sports">Спорт</option>
+        </select>
+      </div>
+
+      <!-- Duration -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Продолжительность (мин)</label>
+        <input data-filter type="number" name="duration" class="w-full p-2 border border-slate-300 rounded-md" placeholder="Напр. 180">
+      </div>
+      <!-- Format -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Формат</label>
+        <select data-filter name="format" class="w-full p-2 border border-slate-300 rounded-md">
+          <option value="">Любой</option>
+          <option value="onsite">Офлайн</option>
+          <option value="online">Онлайн</option>
+          <option value="hybrid">Гибрид</option>
+        </select>
+      </div>
+      <!-- Возраст -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Возраст до</label>
+        <input data-filter type="number" name="min_age" class="w-full p-2 border border-slate-300 rounded-md" placeholder="18">
+      </div>
+      <!-- Навыки -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Навыки</label>
+        <input data-filter type="text" name="skills" class="w-full p-2 border border-slate-300 rounded-md" placeholder="например, first aid">
+      </div>
+      <!-- Интересы -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Интересы</label>
+        <input data-filter type="text" name="interests" class="w-full p-2 border border-slate-300 rounded-md" placeholder="например, animals">
+      </div>
+      <!-- Радиус (км) -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Радиус (км)</label>
+        <input data-filter type="number" name="radius" class="w-full p-2 border border-slate-300 rounded-md" placeholder="10">
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Grid -->
+  <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+    <%~ include('partials/events-grid', { events: it.events }) %>
+  </div>
+
+  <!-- Load More -->
+  <% if (it.events && it.events.length >= 12) { %>
+  <div class="text-center mt-12">
+    <button 
+      class="px-8 py-3 bg-white border border-slate-300 rounded-md hover:bg-slate-50 font-medium transition-colors"
+      hx-get="/events/load-more"
+      hx-target="#events-grid"
+      hx-swap="beforeend"
+    >
+      Загрузить ещё
+    </button>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+
+    // Auto-submit filters on change
+    document.querySelectorAll('[data-filter]').forEach(filter => {
+      filter.addEventListener('change', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput) {
+          htmx.trigger(searchInput, 'input');
+        }
+      });
+    });
+
+    const locationSelect = document.querySelector('select[name="location"]');
+    const latInput = document.querySelector('input[name="lat"]');
+    const lonInput = document.querySelector('input[name="lon"]');
+    const cityCoords = {
+      moscow: { lat: 55.7558, lon: 37.6176 },
+      spb: { lat: 59.9311, lon: 30.3609 }
+    };
+    locationSelect?.addEventListener('change', () => {
+      const val = locationSelect.value as keyof typeof cityCoords;
+      if (cityCoords[val]) {
+        latInput.value = cityCoords[val].lat.toString();
+        lonInput.value = cityCoords[val].lon.toString();
+      } else {
+        latInput.value = '';
+        lonInput.value = '';
+      }
+    });
+
+    const saveBtn = document.getElementById('save-search');
+    const savedContainer = document.getElementById('saved-searches');
+    function renderSaved() {
+      const saved = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+      savedContainer.innerHTML = '';
+      saved.forEach((qs: string) => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3 py-1 border border-slate-300 rounded-md text-sm';
+        btn.textContent = qs;
+        btn.addEventListener('click', () => {
+          const params = new URLSearchParams(qs);
+          document.querySelectorAll('[data-filter]').forEach((el: HTMLInputElement | HTMLSelectElement) => {
+            const v = params.get(el.name);
+            if (v !== null) el.value = v;
+          });
+          const searchInput = document.querySelector('input[name="q"]');
+          if (searchInput) htmx.trigger(searchInput, 'input');
+        });
+        savedContainer.appendChild(btn);
+      });
+    }
+    renderSaved();
+
+    saveBtn?.addEventListener('click', () => {
+      const params = new URLSearchParams();
+      document.querySelectorAll('[data-filter]').forEach((el: HTMLInputElement | HTMLSelectElement) => {
+        if (el.value) params.set(el.name, el.value);
+      });
+      const saved = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+      const qs = params.toString();
+      if (qs && !saved.includes(qs)) {
+        saved.push(qs);
+        localStorage.setItem('savedSearches', JSON.stringify(saved));
+        renderSaved();
+      }
+    });
+  });
+</script>

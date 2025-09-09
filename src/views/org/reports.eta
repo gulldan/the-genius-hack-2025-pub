@@ -1,0 +1,428 @@
+<% layout('../layout', { title: 'Отчёты и аналитика - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">Отчёты и аналитика</h1>
+        <p class="text-slate-600">Статистика и аналитика по вашим мероприятиям</p>
+      </div>
+      <div class="flex space-x-3">
+        <select class="px-4 py-2 border border-slate-300 rounded-md" onchange="changePeriod(this.value)">
+          <option value="week" <%= it.period === 'week' ? 'selected' : '' %>>Неделя</option>
+          <option value="month" <%= it.period === 'month' ? 'selected' : '' %>>Месяц</option>
+          <option value="year" <%= it.period === 'year' ? 'selected' : '' %>>Год</option>
+        </select>
+        <a href="/org/<%= it.orgId %>" class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+          К дашборду
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="calendar" class="w-6 h-6 text-blue-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Всего событий</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.events.total_events || 0 %></p>
+          <p class="text-xs text-slate-500"><%= it.stats.events.published_events || 0 %> опубликовано</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Заявки</p>
+          <p class="text-2xl font-bold text-slate-900"><%= it.stats.applications.total_applications || 0 %></p>
+          <p class="text-xs text-slate-500"><%= it.stats.applications.approved_applications || 0 %> одобрено</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="check-circle" class="w-6 h-6 text-purple-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Посещаемость</p>
+          <p class="text-2xl font-bold text-slate-900">
+            <%= it.stats.attendance.checked_in || 0 %>/<%= it.stats.attendance.total_attendance || 0 %>
+          </p>
+          <% 
+            const attendanceRate = it.stats.attendance.total_attendance > 0 
+              ? Math.round((it.stats.attendance.checked_in / it.stats.attendance.total_attendance) * 100)
+              : 0;
+          %>
+          <p class="text-xs text-slate-500"><%= attendanceRate %>% явка</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="clock" class="w-6 h-6 text-orange-600"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Средние часы</p>
+          <p class="text-2xl font-bold text-slate-900">
+            <%= it.stats.attendance.avg_hours ? Math.round(it.stats.attendance.avg_hours * 10) / 10 : 0 %>
+          </p>
+          <p class="text-xs text-slate-500">часов на волонтёра</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Charts -->
+    <div class="space-y-8">
+      <!-- Applications Over Time -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Заявки по времени</h3>
+        <div class="h-64 flex items-center justify-center bg-slate-50 rounded-lg">
+          <div class="text-center">
+            <i data-lucide="bar-chart-3" class="w-12 h-12 text-slate-400 mx-auto mb-2"></i>
+            <p class="text-slate-500">График заявок</p>
+            <p class="text-xs text-slate-400">
+              <% if (it.charts.applications_over_time.length > 0) { %>
+                <%= it.charts.applications_over_time.length %> точек данных
+              <% } else { %>
+                Нет данных для отображения
+              <% } %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events by Category -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">События по категориям</h3>
+        <% if (it.charts.events_by_category.length > 0) { %>
+          <div class="space-y-3">
+            <% it.charts.events_by_category.forEach(cat => { %>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-700">
+                  <% 
+                    const categoryNames = {
+                      'animals': 'Помощь животным',
+                      'environment': 'Экология',
+                      'social': 'Социальная помощь',
+                      'education': 'Образование',
+                      'health': 'Здравоохранение',
+                      'culture': 'Культура',
+                      'sports': 'Спорт'
+                    };
+                  %>
+                  <%= categoryNames[cat.category] || cat.category || 'Без категории' %>
+                </span>
+                <div class="flex items-center space-x-2">
+                  <div class="w-24 bg-slate-200 rounded-full h-2">
+                    <div 
+                      class="bg-emerald-500 h-2 rounded-full" 
+                      style="width: <%= Math.min((cat.count / Math.max(...it.charts.events_by_category.map(c => c.count))) * 100, 100) %>%"
+                    ></div>
+                  </div>
+                  <span class="text-sm font-medium text-slate-900 w-8"><%= cat.count %></span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-8 text-slate-500">
+            <i data-lucide="pie-chart" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>Нет данных по категориям</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Tables and Lists -->
+    <div class="space-y-8">
+      <!-- Conversion Funnel -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Воронка конверсии</h3>
+        <div id="conversion-funnel" class="space-y-2">
+          <div class="h-4 bg-slate-300 rounded w-3/4 animate-pulse"></div>
+          <div class="h-4 bg-slate-300 rounded w-2/3 animate-pulse"></div>
+          <div class="h-4 bg-slate-300 rounded w-1/2 animate-pulse"></div>
+          <div class="h-4 bg-slate-300 rounded w-1/3 animate-pulse"></div>
+          <div class="h-4 bg-slate-300 rounded w-1/4 animate-pulse"></div>
+        </div>
+      </div>
+
+      <!-- Volunteer Retention -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Удержание волонтёров</h3>
+        <div id="volunteer-retention" class="space-y-2">
+          <div class="h-4 bg-slate-300 rounded w-1/2 animate-pulse"></div>
+          <div class="h-4 bg-slate-300 rounded w-1/3 animate-pulse"></div>
+        </div>
+      </div>
+
+      <!-- Top Volunteers -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Топ волонтёры</h3>
+        <% if (it.topVolunteers.length > 0) { %>
+          <div class="space-y-3">
+            <% it.topVolunteers.slice(0, 5).forEach((volunteer, index) => { %>
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-sm">
+                  <%= index + 1 %>
+                </div>
+                <div class="flex-1">
+                  <p class="font-medium text-slate-900"><%= volunteer.name %></p>
+                  <p class="text-sm text-slate-600">
+                    <%= volunteer.events_count %> событий • 
+                    <%= Math.round(volunteer.total_hours || 0) %> часов
+                  </p>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-medium text-slate-900">
+                    <%= Math.round((volunteer.attendance_rate || 0) * 100) %>%
+                  </div>
+                  <div class="text-xs text-slate-500">явка</div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-8 text-slate-500">
+            <i data-lucide="users" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>Нет данных о волонтёрах</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Incidents -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Инциденты</h3>
+          <form method="get" class="flex items-center space-x-2">
+            <input type="hidden" name="period" value="<%= it.period %>">
+            <select name="incident_type" onchange="this.form.submit()" class="px-2 py-1 border border-slate-300 rounded-md">
+              <option value="" <%= it.incidentType ? '' : 'selected' %>>Все типы</option>
+              <option value="late" <%= it.incidentType === 'late' ? 'selected' : '' %>>Опоздание</option>
+              <option value="injury" <%= it.incidentType === 'injury' ? 'selected' : '' %>>Травма</option>
+              <option value="equipment" <%= it.incidentType === 'equipment' ? 'selected' : '' %>>Оборудование</option>
+              <option value="conflict" <%= it.incidentType === 'conflict' ? 'selected' : '' %>>Конфликт</option>
+              <option value="other" <%= it.incidentType === 'other' ? 'selected' : '' %>>Другое</option>
+            </select>
+          </form>
+        </div>
+        <% if (it.incidents && it.incidents.length > 0) { %>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="text-left py-2 px-3">Дата</th>
+                  <th class="text-left py-2 px-3">Событие</th>
+                  <th class="text-left py-2 px-3">Тип</th>
+                  <th class="text-left py-2 px-3">Волонтёр</th>
+                  <th class="text-left py-2 px-3">Описание</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <% it.incidents.forEach(inc => { %>
+                  <tr>
+                    <td class="py-2 px-3"><%= new Date(inc.created_at).toLocaleDateString('ru-RU') %></td>
+                    <td class="py-2 px-3"><%= inc.event_title %></td>
+                    <td class="py-2 px-3"><%= inc.type %></td>
+                    <td class="py-2 px-3"><%= inc.user_name || '-' %></td>
+                    <td class="py-2 px-3"><%= inc.note %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="text-center py-8 text-slate-500">
+            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>Инцидентов не найдено</p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Последняя активность</h3>
+        <div id="recent-activity" class="space-y-3">
+          <!-- Будет загружено через HTMX -->
+          <div class="flex items-center space-x-3 animate-pulse">
+            <div class="w-2 h-2 bg-slate-300 rounded-full"></div>
+            <div class="h-4 bg-slate-300 rounded flex-1"></div>
+          </div>
+          <div class="flex items-center space-x-3 animate-pulse">
+            <div class="w-2 h-2 bg-slate-300 rounded-full"></div>
+            <div class="h-4 bg-slate-300 rounded flex-1"></div>
+          </div>
+          <div class="flex items-center space-x-3 animate-pulse">
+            <div class="w-2 h-2 bg-slate-300 rounded-full"></div>
+            <div class="h-4 bg-slate-300 rounded flex-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Экспорт данных</h3>
+        <div class="space-y-3">
+          <button 
+            onclick="exportAllEvents()"
+            class="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+            Все события (CSV)
+          </button>
+          
+          <button 
+            onclick="exportVolunteers()"
+            class="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            <i data-lucide="users" class="w-4 h-4 mr-2"></i>
+            База волонтёров (CSV)
+          </button>
+          
+          <button 
+            onclick="exportAnalytics()"
+            class="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>
+            Аналитика (JSON)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+      loadRecentActivity();
+      loadConversionFunnel();
+      loadVolunteerRetention();
+    });
+
+  function changePeriod(period) {
+    const url = new URL(window.location);
+    url.searchParams.set('period', period);
+    window.location = url.toString();
+  }
+
+  function loadRecentActivity() {
+    fetch(`/api/analytics/widget/recent-activity?org_id=<%= it.orgId %>`)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('recent-activity');
+        
+        if (data.activities && data.activities.length > 0) {
+          container.innerHTML = data.activities.slice(0, 5).map(activity => {
+            const eventNames = {
+              'signup_submitted': 'Новая заявка',
+              'application_approved': 'Заявка одобрена',
+              'checkin_success': 'Чекин',
+              'checkout_success': 'Чекаут',
+              'event_viewed': 'Просмотр события'
+            };
+            
+            const eventName = eventNames[activity.event_type] || activity.event_type;
+            const userName = activity.user_name || 'Гость';
+            const time = new Date(activity.created_at).toLocaleString('ru-RU');
+            
+            return `
+              <div class="flex items-center space-x-3">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <span class="text-sm text-slate-600">
+                  <strong>${userName}</strong> - ${eventName}
+                </span>
+                <span class="text-xs text-slate-400">${time}</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          container.innerHTML = `
+            <div class="text-center py-4 text-slate-500">
+              <i data-lucide="activity" class="w-6 h-6 mx-auto mb-2"></i>
+              <p class="text-sm">Нет недавней активности</p>
+            </div>
+          `;
+        }
+      })
+      .catch(error => {
+        console.error('Failed to load activity:', error);
+        document.getElementById('recent-activity').innerHTML = `
+          <div class="text-center py-4 text-red-500">
+            <p class="text-sm">Ошибка загрузки активности</p>
+          </div>
+        `;
+      });
+  }
+
+  function exportAllEvents() {
+    showToast('Экспорт всех событий - в разработке', 'info');
+  }
+
+  function exportVolunteers() {
+    showToast('Экспорт базы волонтёров - в разработке', 'info');
+  }
+
+  function exportAnalytics() {
+    showToast('Экспорт аналитики - в разработке', 'info');
+  }
+
+  function loadConversionFunnel() {
+    fetch(`/api/analytics/widget/conversion-funnel?org_id=<%= it.orgId %>`)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('conversion-funnel');
+        const f = data.funnel;
+        if (f) {
+          container.innerHTML = `
+            <div class="flex justify-between text-sm text-slate-700"><span>Просмотры</span><span>${f.views || 0}</span></div>
+            <div class="flex justify-between text-sm text-slate-700"><span>Открытия заявки</span><span>${f.signup_opens || 0}</span></div>
+            <div class="flex justify-between text-sm text-slate-700"><span>Заявки</span><span>${f.signups || 0}</span></div>
+            <div class="flex justify-between text-sm text-slate-700"><span>Одобрено</span><span>${f.approvals || 0}</span></div>
+            <div class="flex justify-between text-sm text-slate-700"><span>Чекин</span><span>${f.checkins || 0}</span></div>
+          `;
+        } else {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center">Нет данных</p>';
+        }
+      })
+      .catch(() => {
+        document.getElementById('conversion-funnel').innerHTML = '<p class="text-sm text-red-500 text-center">Ошибка загрузки</p>';
+      });
+  }
+
+  function loadVolunteerRetention() {
+    fetch(`/api/analytics/widget/volunteer-retention?org_id=<%= it.orgId %>`)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('volunteer-retention');
+        const r = data.retention;
+        if (r) {
+          container.innerHTML = `
+            <div class="flex justify-between text-sm text-slate-700"><span>Всего волонтёров</span><span>${r.total_volunteers || 0}</span></div>
+            <div class="flex justify-between text-sm text-slate-700"><span>Вернувшиеся</span><span>${r.returning_volunteers || 0}</span></div>
+          `;
+        } else {
+          container.innerHTML = '<p class="text-sm text-slate-500 text-center">Нет данных</p>';
+        }
+      })
+      .catch(() => {
+        document.getElementById('volunteer-retention').innerHTML = '<p class="text-sm text-red-500 text-center">Ошибка загрузки</p>';
+      });
+  }
+  </script>

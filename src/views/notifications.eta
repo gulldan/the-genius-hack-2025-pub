@@ -1,0 +1,52 @@
+<% layout('layout', { title: 'Настройки уведомлений - VolunteerHub' }) %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-2xl font-bold text-slate-900 mb-6">Настройки уведомлений</h1>
+
+  <% if (it.settings.notifications_telegram && !it.telegramLinked) { %>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start space-x-2">
+        <i data-lucide="smartphone" class="w-5 h-5 text-blue-600"></i>
+        <div>
+          <p class="text-sm text-blue-700 mb-2">
+            Подключите нашего Telegram-бота, чтобы получать уведомления.
+          </p>
+          <a href="<%= it.botLink %>" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium" target="_blank">Инструкция</a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <form action="/account/notifications" method="post" class="space-y-8">
+    <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+    <div class="space-y-4">
+      <label class="flex items-center justify-between">
+        <span class="text-slate-700">Получать в Telegram</span>
+        <input type="checkbox" name="telegram" class="h-5 w-5 text-emerald-600" <%= it.settings.notifications_telegram ? 'checked' : '' %> />
+      </label>
+      <label class="flex items-center justify-between">
+        <span class="text-slate-700">Получать по e-mail</span>
+        <input type="checkbox" name="email" class="h-5 w-5 text-emerald-600" <%= it.settings.notifications_email ? 'checked' : '' %> />
+      </label>
+      <label class="flex items-center justify-between">
+        <span class="text-slate-700">Получать по SMS</span>
+        <input type="checkbox" name="sms" class="h-5 w-5 text-emerald-600" <%= it.settings.notifications_sms ? 'checked' : '' %> />
+      </label>
+    </div>
+
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 mb-2">Категории интересов</h2>
+      <p class="text-sm text-slate-600 mb-4">Получайте предложения о новых событиях по выбранным категориям.</p>
+      <div class="space-y-2">
+        <% it.categories.forEach(cat => { const checked = it.interests.includes(cat); %>
+          <label class="flex items-center">
+            <input type="checkbox" name="interests" value="<%= cat %>" class="mr-2" <%= checked ? 'checked' : '' %> />
+            <span class="text-sm text-slate-700"><%= it.categoryLabels[cat] || cat %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+
+    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium">Сохранить</button>
+  </form>
+</div>

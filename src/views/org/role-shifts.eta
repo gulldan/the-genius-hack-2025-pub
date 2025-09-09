@@ -1,0 +1,278 @@
+<% layout('../layout', { title: `Смены - ${it.role.title} - VolunteerHub` }) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Progress Bar -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-3xl font-bold text-slate-900">Настройка смен</h1>
+      <nav class="text-sm text-slate-600">
+        <a href="/org/<%= it.event.org_id %>/events" class="hover:text-slate-900">События</a>
+        <span class="mx-2">›</span>
+        <a href="/org/<%= it.event.org_id %>/events/<%= it.event.id %>/roles" class="hover:text-slate-900"><%= it.event.title %></a>
+        <span class="mx-2">›</span>
+        <span><%= it.role.title %></span>
+      </nav>
+    </div>
+    
+    <div class="bg-white rounded-lg p-4 border border-slate-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-slate-900">Шаг 3 из 8</span>
+        <span class="text-sm text-slate-600">Расписание смен</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-2">
+        <div class="bg-emerald-600 h-2 rounded-full" style="width: 37.5%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Info -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-2"><%= it.role.title %></h2>
+    <% if (it.role.description) { %>
+      <p class="text-slate-600 mb-4"><%= it.role.description %></p>
+    <% } %>
+    
+    <!-- Requirements -->
+    <div class="flex flex-wrap gap-2">
+      <% if (it.role.min_age) { %>
+        <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-sm">
+          Возраст: от <%= it.role.min_age %> лет
+        </span>
+      <% } %>
+      <% if (it.role.required_skills) { %>
+        <% try { const skills = JSON.parse(it.role.required_skills); skills.forEach(skill => { %>
+          <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm"><%= skill %></span>
+        <% }); } catch(e) {} %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Add Shift Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-6">Добавить смену</h2>
+    
+    <form method="post" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Время начала *
+          </label>
+          <input 
+            type="time" 
+            name="start_time" 
+            required
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Время окончания *
+          </label>
+          <input 
+            type="time" 
+            name="end_time" 
+            required
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            Количество мест *
+          </label>
+          <input 
+            type="number" 
+            name="slots" 
+            required
+            min="1"
+            max="100"
+            placeholder="10"
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button 
+          type="submit" 
+          class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+        >
+          Добавить смену
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Existing Shifts -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+    <h2 class="text-xl font-semibold text-slate-900 mb-6">
+      Настроенные смены (<%= it.shifts.length %>)
+    </h2>
+    
+    <% if (it.shifts && it.shifts.length > 0) { %>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="text-left py-3 px-4 font-semibold text-slate-700">Время</th>
+              <th class="text-left py-3 px-4 font-semibold text-slate-700">Мест всего</th>
+              <th class="text-left py-3 px-4 font-semibold text-slate-700">Доступно</th>
+              <th class="text-left py-3 px-4 font-semibold text-slate-700">В очереди</th>
+              <th class="text-left py-3 px-4 font-semibold text-slate-700">Статус</th>
+              <th class="text-right py-3 px-4 font-semibold text-slate-700">Действия</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <% it.shifts.forEach(shift => { %>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-4 px-4">
+                  <span class="font-medium text-slate-900">
+                    <%= shift.start_time %> - <%= shift.end_time %>
+                  </span>
+                </td>
+                <td class="py-4 px-4">
+                  <span class="text-slate-900"><%= shift.capacity %></span>
+                </td>
+                <td class="py-4 px-4">
+                  <span class="font-medium text-green-600">
+                    <%= shift.slots_available || shift.capacity %>
+                  </span>
+                </td>
+                <td class="py-4 px-4">
+                  <span class="text-blue-600">
+                    <%= shift.waitlist_count || 0 %>
+                  </span>
+                </td>
+                <td class="py-4 px-4">
+                  <span class="px-2 py-1 rounded-full text-xs font-medium
+                    <% if (shift.status === 'scheduled') { %>bg-blue-100 text-blue-800
+                    <% } else if (shift.status === 'live') { %>bg-green-100 text-green-800
+                    <% } else if (shift.status === 'finished') { %>bg-slate-100 text-slate-800
+                    <% } else { %>bg-red-100 text-red-800<% } %>">
+                    <% 
+                      const statusNames = {
+                        'scheduled': 'Запланирована',
+                        'live': 'Идёт',
+                        'finished': 'Завершена',
+                        'cancelled': 'Отменена'
+                      };
+                    %>
+                    <%= statusNames[shift.status] || shift.status %>
+                  </span>
+                </td>
+                <td class="py-4 px-4 text-right">
+                  <div class="flex justify-end space-x-2">
+                    <button 
+                      onclick="generateQR('<%= shift.id %>')"
+                      class="bg-slate-600 hover:bg-slate-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                      title="QR-код"
+                    >
+                      <i data-lucide="qr-code" class="w-3 h-3"></i>
+                    </button>
+                    <button 
+                      onclick="editShift('<%= shift.id %>')"
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                      title="Редактировать"
+                    >
+                      <i data-lucide="edit" class="w-3 h-3"></i>
+                    </button>
+                    <button 
+                      onclick="deleteShift('<%= shift.id %>')"
+                      class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
+                      title="Удалить"
+                    >
+                      <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-12 border-2 border-dashed border-slate-300 rounded-lg">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="clock" class="w-8 h-8 text-slate-400"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">Добавьте первую смену</h3>
+        <p class="text-slate-600">Определите расписание работы для этой роли</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex justify-between">
+    <a href="/org/<%= it.event.org_id %>/events/<%= it.event.id %>/roles" class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 font-medium transition-colors">
+      ← К ролям
+    </a>
+    
+    <% if (it.shifts && it.shifts.length > 0) { %>
+      <a href="/org/<%= it.event.org_id %>/events/<%= it.event.id %>/publish" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+        К публикации →
+      </a>
+    <% } else { %>
+      <button class="px-6 py-3 bg-slate-400 text-white rounded-lg font-medium cursor-not-allowed" disabled>
+        Добавьте хотя бы одну смену
+      </button>
+    <% } %>
+  </div>
+
+  <!-- Quick Templates -->
+  <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h4 class="font-semibold text-blue-900 mb-4">Быстрые шаблоны смен</h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <button 
+        onclick="fillShiftTemplate('09:00', '13:00', 10)"
+        class="p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 text-left transition-colors"
+      >
+        <div class="font-medium text-blue-900">Утренняя смена</div>
+        <div class="text-sm text-blue-700">09:00 - 13:00</div>
+      </button>
+      
+      <button 
+        onclick="fillShiftTemplate('13:00', '17:00', 10)"
+        class="p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 text-left transition-colors"
+      >
+        <div class="font-medium text-blue-900">Дневная смена</div>
+        <div class="text-sm text-blue-700">13:00 - 17:00</div>
+      </button>
+      
+      <button 
+        onclick="fillShiftTemplate('09:00', '17:00', 15)"
+        class="p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 text-left transition-colors"
+      >
+        <div class="font-medium text-blue-900">Полный день</div>
+        <div class="text-sm text-blue-700">09:00 - 17:00</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+
+  function fillShiftTemplate(startTime, endTime, slots) {
+    document.querySelector('input[name="start_time"]').value = startTime;
+    document.querySelector('input[name="end_time"]').value = endTime;
+    document.querySelector('input[name="slots"]').value = slots;
+  }
+
+  function generateQR(shiftId) {
+    showToast('QR-код для смены - в разработке', 'info');
+  }
+
+  function editShift(shiftId) {
+    showToast('Редактирование смены - в разработке', 'info');
+  }
+
+  function deleteShift(shiftId) {
+    if (confirm('Удалить эту смену?')) {
+      showToast('Удаление смены - в разработке', 'info');
+    }
+  }
+</script>
+

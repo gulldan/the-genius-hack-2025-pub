@@ -1,0 +1,35 @@
+<!-- Стандартный заголовок страницы -->
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+        <%= it.title %>
+      </h1>
+      <% if (it.subtitle) { %>
+        <p class="text-xl text-slate-600"><%= it.subtitle %></p>
+      <% } %>
+    </div>
+    
+    <% if (it.actions) { %>
+      <div class="flex space-x-3">
+        <% it.actions.forEach(action => { %>
+          <% if (action.type === 'primary') { %>
+            <a href="<%= action.href %>" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+              <% if (action.icon) { %>
+                <i data-lucide="<%= action.icon %>" class="w-4 h-4 mr-2"></i>
+              <% } %>
+              <%= action.label %>
+            </a>
+          <% } else { %>
+            <a href="<%= action.href %>" class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+              <% if (action.icon) { %>
+                <i data-lucide="<%= action.icon %>" class="w-4 h-4 mr-2"></i>
+              <% } %>
+              <%= action.label %>
+            </a>
+          <% } %>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,301 @@
+<% layout('layout', { title: 'Демо геофенсинга - VolunteerHub' }) %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8 text-center">
+    <h1 class="text-3xl font-bold text-slate-900 mb-4">Демонстрация геофенсинга</h1>
+    <p class="text-lg text-slate-600">Технология проверки местоположения для чекина волонтеров</p>
+  </div>
+
+  <!-- Live Demo Section -->
+  <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-8">
+    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+      <i data-lucide="map-pin" class="w-6 h-6 mr-2 text-emerald-600"></i>
+      Проверка геолокации
+    </h2>
+    
+    <!-- Demo Controls -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- User Location -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-slate-800">Ваше местоположение</h3>
+        <div id="user-location-status" class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div class="flex items-center text-slate-600">
+            <i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i>
+            Определение местоположения...
+          </div>
+        </div>
+        <button 
+          id="get-location" 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+        >
+          <i data-lucide="navigation" class="w-4 h-4 mr-2 inline"></i>
+          Получить геолокацию
+        </button>
+      </div>
+
+      <!-- Event Location -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-slate-800">Место мероприятия</h3>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+          <div class="text-emerald-800">
+            <div class="font-medium">Психиатрическая больница №1</div>
+            <div class="text-sm text-emerald-600">Санкт-Петербург, Арсенальная наб., 9</div>
+            <div class="text-sm text-emerald-600 mt-1">
+              Радиус: <span class="font-medium">100 метров</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-xs text-slate-500">
+          Координаты: 59.9311°N, 30.3609°E
+        </div>
+      </div>
+    </div>
+
+    <!-- Distance Check Result -->
+    <div id="distance-result" class="mt-8 hidden">
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-6">
+        <h4 class="text-lg font-semibold mb-4 flex items-center">
+          <i data-lucide="ruler" class="w-5 h-5 mr-2 text-slate-600"></i>
+          Результат проверки
+        </h4>
+        <div id="distance-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-8 mb-8">
+    <h2 class="text-2xl font-semibold mb-6 text-emerald-800">Как работает геофенсинг</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="map" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+        <h3 class="font-semibold text-emerald-800 mb-2">1. Определение зоны</h3>
+        <p class="text-sm text-emerald-700">Для каждого мероприятия задается центральная точка и радиус допустимой зоны</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="navigation" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+        <h3 class="font-semibold text-emerald-800 mb-2">2. Запрос геолокации</h3>
+        <p class="text-sm text-emerald-700">При чекине система запрашивает местоположение волонтера через GPS</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="shield-check" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+        <h3 class="font-semibold text-emerald-800 mb-2">3. Проверка расстояния</h3>
+        <p class="text-sm text-emerald-700">Система вычисляет расстояние и разрешает чекин только в допустимой зоне</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technical Details -->
+  <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-8">
+    <h2 class="text-2xl font-semibold mb-6">Технические детали</h2>
+    
+    <div class="space-y-6">
+      <!-- Algorithm -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800 mb-3">Алгоритм расчета расстояния</h3>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <div class="text-sm text-slate-700">
+            <strong>Формула Haversine:</strong> Используется для вычисления кратчайшего расстояния между двумя точками на сфере (Земле)
+          </div>
+          <div class="mt-2 font-mono text-xs text-slate-600 bg-white border rounded p-2">
+            d = 2r × arcsin(√(sin²(Δφ/2) + cos φ₁ × cos φ₂ × sin²(Δλ/2)))
+          </div>
+        </div>
+      </div>
+
+      <!-- Implementation -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800 mb-3">Реализация</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="font-medium text-blue-800 mb-2">Web API</h4>
+            <ul class="text-sm text-blue-700 space-y-1">
+              <li>• Geolocation API браузера</li>
+              <li>• Точность до 5-10 метров</li>
+              <li>• Работает в HTTPS</li>
+            </ul>
+          </div>
+          <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <h4 class="font-medium text-purple-800 mb-2">Telegram API</h4>
+            <ul class="text-sm text-purple-700 space-y-1">
+              <li>• Клавиатура запроса геолокации</li>
+              <li>• Точность GPS устройства</li>
+              <li>• Интеграция с чат-ботом</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Use Cases -->
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800 mb-3">Сценарии использования</h3>
+        <div class="space-y-3">
+          <div class="flex items-start space-x-3">
+            <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+            <div>
+              <strong class="text-green-700">Полевые мероприятия:</strong>
+              <span class="text-slate-600">Уборка парков, экологические акции, спортивные события</span>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+            <div>
+              <strong class="text-blue-700">Учреждения:</strong>
+              <span class="text-slate-600">Больницы, школы, социальные центры</span>
+            </div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+            <div>
+              <strong class="text-purple-700">Гибридные события:</strong>
+              <span class="text-slate-600">Частично дистанционные с точками сбора</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Actions -->
+  <div class="text-center">
+    <div class="space-x-4">
+      <a 
+        href="/my-qr" 
+        class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+      >
+        <i data-lucide="qr-code" class="w-4 h-4 mr-2"></i>
+        Посмотреть QR-коды
+      </a>
+      <a 
+        href="/account" 
+        class="inline-flex items-center border border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-lg font-medium transition-colors"
+      >
+        <i data-lucide="user" class="w-4 h-4 mr-2"></i>
+        В личный кабинет
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Include geofencing JavaScript -->
+<script>
+<%~ it.geofencingJS %>
+
+document.addEventListener('DOMContentLoaded', function() {
+  lucide.createIcons();
+  
+  const getLocationBtn = document.getElementById('get-location');
+  const userLocationStatus = document.getElementById('user-location-status');
+  const distanceResult = document.getElementById('distance-result');
+  const distanceContent = document.getElementById('distance-content');
+  
+  // Event geofence (Психиатрическая больница №1, СПб)
+  const eventGeofence = {
+    latitude: 59.9311,
+    longitude: 30.3609,
+    radius: 100
+  };
+  
+  getLocationBtn.addEventListener('click', async function() {
+    try {
+      getLocationBtn.disabled = true;
+      getLocationBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 mr-2 inline animate-spin"></i>Определение...';
+      
+      userLocationStatus.innerHTML = `
+        <div class="flex items-center text-blue-600">
+          <i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i>
+          Запрос разрешения на геолокацию...
+        </div>
+      `;
+      
+      const userLocation = await window.GeofencingUtils.getUserLocation();
+      
+      // Show user location
+      userLocationStatus.innerHTML = `
+        <div class="space-y-2">
+          <div class="flex items-center text-green-600">
+            <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+            Местоположение получено
+          </div>
+          <div class="text-sm text-slate-600">
+            <div>Широта: ${userLocation.latitude.toFixed(6)}°</div>
+            <div>Долгота: ${userLocation.longitude.toFixed(6)}°</div>
+            <div>Точность: ±${Math.round(userLocation.accuracy || 0)} м</div>
+          </div>
+        </div>
+      `;
+      
+      // Calculate and show distance
+      const result = window.GeofencingUtils.validateDistance(userLocation, eventGeofence);
+      
+      distanceContent.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600">Расстояние до центра:</span>
+            <span class="font-medium text-slate-900">${result.distance} метров</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600">Допустимый радиус:</span>
+            <span class="font-medium text-slate-900">${eventGeofence.radius} метров</span>
+          </div>
+          <div class="border-t pt-4">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600">Статус чекина:</span>
+              <span class="font-medium ${result.valid ? 'text-green-600' : 'text-red-600'}">
+                ${result.valid ? '✅ Разрешен' : '❌ Запрещен'}
+              </span>
+            </div>
+            <div class="mt-2 text-sm ${result.valid ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'} p-3 rounded-lg">
+              ${result.message}
+            </div>
+          </div>
+          
+          <!-- Visual representation -->
+          <div class="mt-6 border-t pt-4">
+            <h5 class="font-medium text-slate-800 mb-3">Визуализация</h5>
+            <div class="relative bg-slate-100 rounded-lg p-4 h-32 flex items-center justify-center">
+              <!-- Event center -->
+              <div class="absolute w-4 h-4 bg-emerald-500 rounded-full" style="left: 50%; top: 50%; transform: translate(-50%, -50%)">
+                <div class="absolute w-8 h-8 border-2 border-emerald-300 rounded-full" style="left: 50%; top: 50%; transform: translate(-50%, -50%)"></div>
+                <div class="absolute w-12 h-12 border-2 border-emerald-200 rounded-full" style="left: 50%; top: 50%; transform: translate(-50%, -50%)"></div>
+              </div>
+              <!-- User position -->
+              <div class="absolute w-3 h-3 ${result.valid ? 'bg-blue-500' : 'bg-red-500'} rounded-full" 
+                   style="left: ${50 + Math.min(Math.max((result.distance / 200) * 30, -40), 40)}%; top: 50%; transform: translate(-50%, -50%)">
+              </div>
+              <div class="absolute bottom-2 left-2 text-xs text-slate-500">
+                <div>🎯 Место события</div>
+                <div>${result.valid ? '📍' : '📍'} Ваше местоположение</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      distanceResult.classList.remove('hidden');
+      
+    } catch (error) {
+      console.error('Geolocation error:', error);
+      userLocationStatus.innerHTML = `
+        <div class="flex items-center text-red-600">
+          <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
+          Ошибка: ${error.message}
+        </div>
+      `;
+    } finally {
+      getLocationBtn.disabled = false;
+      getLocationBtn.innerHTML = '<i data-lucide="navigation" class="w-4 h-4 mr-2 inline"></i>Получить геолокацию';
+    }
+  });
+});
+</script>

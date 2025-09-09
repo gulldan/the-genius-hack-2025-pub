@@ -1,0 +1,14 @@
+/* biome-ignore lint/suspicious/noUnknownAtRules: tailwind directives */
+@tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: tailwind directives */
+@tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: tailwind directives */
+@tailwind utilities;
+
+:root {
+	--accent: oklch(0.75 0.21 145);
+}
+
+.dark {
+	color-scheme: dark;
+}

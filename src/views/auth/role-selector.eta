@@ -1,0 +1,130 @@
+<% layout('../layout', { title: 'Выбор роли - VolunteerHub' }) %>
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl w-full space-y-8">
+    <div class="text-center">
+      <div class="flex justify-center">
+        <div class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center">
+          <i data-lucide="crown" class="w-8 h-8 text-white"></i>
+        </div>
+      </div>
+      <h2 class="mt-6 text-3xl font-bold text-slate-900">
+        Добро пожаловать, <%= it.user.name %>!
+      </h2>
+      <p class="mt-2 text-sm text-slate-600">
+        У вас есть доступ к нескольким ролям. Выберите, какую роль использовать сейчас.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <!-- Волонтер -->
+      <form action="/role-selector" method="POST" class="h-full">
+        <input type="hidden" name="selectedRole" value="volunteer">
+        <button type="submit" class="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center hover:shadow-md hover:border-blue-300 transition-all group">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-200 transition-colors">
+            <i data-lucide="heart" class="w-8 h-8 text-blue-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-slate-900">Волонтер</h3>
+          <p class="text-slate-600 mb-4">Участие в мероприятиях</p>
+          <div class="text-sm text-slate-500 space-y-1">
+            <p>• Поиск и запись на события</p>
+            <p>• Личный кабинет волонтера</p>
+            <p>• История участия</p>
+            <p>• Telegram уведомления</p>
+          </div>
+        </button>
+      </form>
+
+      <!-- Координатор -->
+      <form action="/role-selector" method="POST" class="h-full">
+        <input type="hidden" name="selectedRole" value="coordinator">
+        <button type="submit" class="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center hover:shadow-md hover:border-emerald-300 transition-all group">
+          <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-emerald-200 transition-colors">
+            <i data-lucide="users" class="w-8 h-8 text-emerald-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-slate-900">Координатор</h3>
+          <p class="text-slate-600 mb-4">Управление событиями</p>
+          <div class="text-sm text-slate-500 space-y-1">
+            <p>• Панель координатора</p>
+            <p>• Live-управление событиями</p>
+            <p>• Чекин/чекаут волонтеров</p>
+            <p>• Аналитика и отчеты</p>
+          </div>
+        </button>
+      </form>
+
+      <!-- Организатор -->
+      <form action="/role-selector" method="POST" class="h-full">
+        <input type="hidden" name="selectedRole" value="organizer">
+        <button type="submit" class="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center hover:shadow-md hover:border-purple-300 transition-all group">
+          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-200 transition-colors">
+            <i data-lucide="building" class="w-8 h-8 text-purple-600"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-slate-900">Организатор</h3>
+          <p class="text-slate-600 mb-4">Создание мероприятий</p>
+          <div class="text-sm text-slate-500 space-y-1">
+            <p>• Дашборд организации</p>
+            <p>• Создание событий</p>
+            <p>• Управление заявками</p>
+            <p>• Настройки организации</p>
+          </div>
+        </button>
+      </form>
+    </div>
+
+    <!-- Quick Access Info -->
+    <div class="bg-slate-50 rounded-xl p-6 mt-8">
+      <div class="flex items-start">
+        <i data-lucide="info" class="w-5 h-5 text-slate-600 mr-2 mt-0.5"></i>
+        <div class="text-sm text-slate-600">
+          <strong>Совет:</strong> Вы можете переключаться между ролями в любое время. 
+          В навигации каждой роли есть соответствующие ссылки для быстрого перехода.
+          <div class="mt-2 space-x-4">
+            <span class="inline-flex items-center">
+              <kbd class="px-2 py-1 bg-white border border-slate-300 rounded text-xs mr-1">Ctrl+1</kbd>
+              Волонтер
+            </span>
+            <span class="inline-flex items-center">
+              <kbd class="px-2 py-1 bg-white border border-slate-300 rounded text-xs mr-1">Ctrl+2</kbd>
+              Координатор
+            </span>
+            <span class="inline-flex items-center">
+              <kbd class="px-2 py-1 bg-white border border-slate-300 rounded text-xs mr-1">Ctrl+3</kbd>
+              Организатор
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center">
+      <p class="text-sm text-slate-500">
+        Демо-режим • Все функции доступны • 
+        <a href="/logout" class="text-emerald-600 hover:text-emerald-700 font-medium">Выйти</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '1') {
+          e.preventDefault();
+          document.querySelector('input[value="volunteer"]').closest('form').submit();
+        } else if (e.key === '2') {
+          e.preventDefault();
+          document.querySelector('input[value="coordinator"]').closest('form').submit();
+        } else if (e.key === '3') {
+          e.preventDefault();
+          document.querySelector('input[value="organizer"]').closest('form').submit();
+        }
+      }
+    });
+  });
+</script>

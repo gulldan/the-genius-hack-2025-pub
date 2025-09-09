@@ -1,0 +1,55 @@
+{
+	"name": "KvadricepsHub - Платформа волонтёрских мероприятий",
+	"short_name": "KvadricepsHub",
+	"description": "Найдите волонтёрские возможности или организуйте мероприятие",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#f8fafc",
+	"theme_color": "#10b981",
+	"orientation": "portrait-primary",
+	"icons": [
+		{
+			"src": "/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	],
+	"categories": ["social", "utilities"],
+	"screenshots": [
+		{
+			"src": "/screenshot-mobile.png",
+			"sizes": "390x844",
+			"type": "image/png",
+			"form_factor": "narrow"
+		},
+		{
+			"src": "/screenshot-desktop.png",
+			"sizes": "1280x800",
+			"type": "image/png",
+			"form_factor": "wide"
+		}
+	],
+	"shortcuts": [
+		{
+			"name": "Найти события",
+			"short_name": "События",
+			"description": "Просмотр доступных волонтёрских мероприятий",
+			"url": "/events",
+			"icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+		},
+		{
+			"name": "Мой профиль",
+			"short_name": "Профиль",
+			"description": "Личный кабинет волонтёра",
+			"url": "/account",
+			"icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+		}
+	]
+}

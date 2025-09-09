@@ -1,0 +1,174 @@
+<% layout('../layout', { title: 'Вход - VolunteerHub' }) %>
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <!-- Error/Success Messages -->
+    <% if (it.error) { %>
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center">
+        <% if (it.error === 'invalid_credentials') { %>
+          Неверный пароль. Для демо используйте пароль: <code class="bg-red-200 px-1 rounded">demo123</code>
+        <% } else if (it.error === 'user_not_found') { %>
+          Пользователь с таким email не найден
+        <% } else { %>
+          Ошибка входа в систему
+        <% } %>
+      </div>
+    <% } else if (it.success) { %>
+      <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center">
+        Вход успешно выполнен
+      </div>
+    <% } else { %>
+      <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-center">
+        Подключите Telegram или используйте демо-логин
+      </div>
+    <% } %>
+    <div class="text-center">
+      <div class="flex justify-center">
+        <div class="w-16 h-16 bg-emerald-500 rounded-xl flex items-center justify-center">
+          <i data-lucide="heart-handshake" class="w-8 h-8 text-white"></i>
+        </div>
+      </div>
+      <h2 class="mt-6 text-3xl font-bold text-slate-900">
+        Войти в аккаунт
+      </h2>
+      <p class="mt-2 text-sm text-slate-600">
+        Присоединяйтесь к сообществу волонтёров
+      </p>
+    </div>
+
+    <div class="bg-white py-8 px-6 shadow-sm rounded-xl border border-slate-200">
+      <!-- Telegram Login -->
+      <div class="mb-8">
+        <div class="text-center">
+          <div class="flex items-center justify-center mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">
+              Быстрый вход через Telegram
+            </h3>
+            <% if (!it.telegramEnabled) { %>
+              <span class="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                TODO
+              </span>
+            <% } %>
+          </div>
+          
+          <% if (it.telegramEnabled) { %>
+            <p class="text-sm text-slate-600 mb-6">
+              Получайте уведомления и подтверждения прямо в мессенджере
+            </p>
+          <% } else { %>
+            <p class="text-sm text-slate-500 mb-6">
+              Демо-режим: Telegram авторизация будет работать после настройки бота
+            </p>
+          <% } %>
+          
+          <div class="flex justify-center">
+            <%~ it.telegramWidget %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="relative mb-8">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-slate-200"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-slate-500">или</span>
+        </div>
+      </div>
+
+      <!-- Email Login Form -->
+      <form class="space-y-6" method="post" action="/login">
+        <input type="hidden" name="csrf_token" value="<%= it.csrf %>">
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+            Email
+          </label>
+          <input 
+            id="email" 
+            name="email" 
+            type="email" 
+            required 
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="your@email.com"
+          >
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-700 mb-2">
+            Пароль
+          </label>
+          <input 
+            id="password" 
+            name="password" 
+            type="password" 
+            required 
+            class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            placeholder="••••••••"
+          >
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <input 
+              id="remember-me" 
+              name="remember-me" 
+              type="checkbox" 
+              class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded"
+            >
+            <label for="remember-me" class="ml-2 block text-sm text-slate-700">
+              Запомнить меня
+            </label>
+          </div>
+
+          <div class="text-sm">
+            <a href="/forgot-password" class="font-medium text-emerald-600 hover:text-emerald-500">
+              Забыли пароль?
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <button 
+            type="submit" 
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+          >
+            Войти
+          </button>
+        </div>
+      </form>
+
+      <!-- Register Link -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-slate-600">
+          Нет аккаунта?
+          <a href="/register" class="font-medium text-emerald-600 hover:text-emerald-500">
+            Зарегистрироваться
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Help -->
+    <div class="text-center">
+      <p class="text-xs text-slate-500">
+        Нужна помощь? 
+        <a href="/help" class="text-emerald-600 hover:text-emerald-500">
+          Свяжитесь с нами
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    // Check for registration success
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('registered') === '1') {
+      showToast('Регистрация успешна! Теперь войдите в аккаунт.', 'success');
+    }
+  });
+</script>

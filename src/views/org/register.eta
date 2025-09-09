@@ -1,0 +1,226 @@
+<% layout('../layout', { title: 'Регистрация организации - VolunteerHub' }) %>
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl w-full space-y-8">
+    <div class="text-center">
+      <div class="flex justify-center">
+        <div class="w-16 h-16 bg-emerald-500 rounded-xl flex items-center justify-center">
+          <i data-lucide="building" class="w-8 h-8 text-white"></i>
+        </div>
+      </div>
+      <h2 class="mt-6 text-3xl font-bold text-slate-900">
+        Регистрация организации
+      </h2>
+      <p class="mt-2 text-sm text-slate-600">
+        Присоединяйтесь к платформе и находите волонтёров
+      </p>
+    </div>
+
+    <div class="bg-white py-8 px-6 shadow-sm rounded-xl border border-slate-200">
+      <% if (it.error) { %>
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-red-400 mt-0.5 mr-3"></i>
+            <p class="text-sm text-red-700"><%= it.error %></p>
+          </div>
+        </div>
+      <% } %>
+
+      <form class="space-y-6" method="post" action="/org/register">
+        <!-- Organization Info -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-slate-900">Информация об организации</h3>
+          
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+              Название организации *
+            </label>
+            <input 
+              id="name" 
+              name="name" 
+              type="text" 
+              required 
+              class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="НКО 'Помощь людям'"
+            >
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="city" class="block text-sm font-medium text-slate-700 mb-2">
+                Город *
+              </label>
+              <select 
+                id="city" 
+                name="city" 
+                required 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              >
+                <option value="">Выберите город</option>
+                <option value="Санкт-Петербург">Санкт-Петербург</option>
+                <option value="Пермь">Пермь</option>
+                <option value="Покачи">Покачи</option>
+                <option value="Москва">Москва</option>
+                <option value="Екатеринбург">Екатеринбург</option>
+                <option value="Новосибирск">Новосибирск</option>
+                <option value="Другой">Другой город</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="website" class="block text-sm font-medium text-slate-700 mb-2">
+                Веб-сайт
+              </label>
+              <input 
+                id="website" 
+                name="website" 
+                type="url" 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="https://your-org.ru"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+              Описание деятельности *
+            </label>
+            <textarea 
+              id="description" 
+              name="description" 
+              required 
+              rows="4"
+              class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="Расскажите о миссии и деятельности вашей организации..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="space-y-4 pt-6 border-t border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-900">Контактная информация</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                Email организации *
+              </label>
+              <input 
+                id="email" 
+                name="email" 
+                type="email" 
+                required 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="info@your-org.ru"
+              >
+            </div>
+
+            <div>
+              <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">
+                Телефон
+              </label>
+              <input 
+                id="phone" 
+                name="phone" 
+                type="tel" 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="+7 (999) 123-45-67"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="contact_name" class="block text-sm font-medium text-slate-700 mb-2">
+                Контактное лицо *
+              </label>
+              <input 
+                id="contact_name" 
+                name="contact_name" 
+                type="text" 
+                required 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="Иван Иванов"
+              >
+            </div>
+
+            <div>
+              <label for="contact_email" class="block text-sm font-medium text-slate-700 mb-2">
+                Email контактного лица *
+              </label>
+              <input 
+                id="contact_email" 
+                name="contact_email" 
+                type="email" 
+                required 
+                class="w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="ivan@your-org.ru"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms -->
+        <div class="flex items-start pt-6 border-t border-slate-200">
+          <input 
+            id="terms" 
+            name="terms" 
+            type="checkbox" 
+            required
+            class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded mt-1"
+          >
+          <label for="terms" class="ml-2 block text-sm text-slate-700">
+            Я подтверждаю, что имею право действовать от имени организации и согласен с 
+            <a href="/terms" class="text-emerald-600 hover:text-emerald-500">условиями использования</a>
+            и 
+            <a href="/privacy" class="text-emerald-600 hover:text-emerald-500">политикой конфиденциальности</a>
+          </label>
+        </div>
+
+        <div>
+          <button 
+            type="submit" 
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+          >
+            Зарегистрировать организацию
+          </button>
+        </div>
+      </form>
+
+      <!-- Login Link -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-slate-600">
+          Уже зарегистрированы?
+          <a href="/login" class="font-medium text-emerald-600 hover:text-emerald-500">
+            Войти в аккаунт
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <div class="flex">
+        <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5 mr-3"></i>
+        <div>
+          <h4 class="text-sm font-semibold text-blue-900 mb-2">
+            Что вы получите после регистрации?
+          </h4>
+          <ul class="text-xs text-blue-700 space-y-1">
+            <li>• Возможность создавать и публиковать события</li>
+            <li>• Инструменты для управления волонтёрами</li>
+            <li>• Система чекина и отчётности</li>
+            <li>• Интеграция с Telegram для уведомлений</li>
+            <li>• Аналитика и статистика по мероприятиям</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+</script>

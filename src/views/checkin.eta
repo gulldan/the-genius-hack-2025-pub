@@ -1,0 +1,11 @@
+<% layout('layout', { title: 'Check-in' }) %>
+<table class="w-full text-left">
+  <thead>
+    <tr><th>Name</th><th>Role</th><th>Status</th></tr>
+  </thead>
+  <tbody id="checkin-body">
+    <% it.signups.forEach((s) => { %>
+      <%~ include('partials/checkin-row', { row: s }) %>
+    <% }) %>
+  </tbody>
+</table>

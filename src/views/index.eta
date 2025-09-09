@@ -1,0 +1,320 @@
+<% layout('layout', { title: 'KvadricepsHub - Платформа волонтёрских мероприятий' }) %>
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+    <div class="text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">
+        Объединяем сердца<br>
+        <span class="text-emerald-200">для добрых дел</span>
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 text-emerald-100 max-w-3xl mx-auto">
+        Найдите волонтёрские возможности рядом с вами или создайте собственное мероприятие. 
+        Вместе мы можем изменить мир к лучшему.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/events" class="bg-white text-emerald-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors inline-flex items-center">
+          <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+          Найти события
+        </a>
+        <a href="/org/register" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-emerald-600 transition-colors inline-flex items-center">
+          <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+          Создать мероприятие
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+        Почему выбирают KvadricepsHub?
+      </h2>
+      <p class="text-xl text-slate-600 max-w-2xl mx-auto">
+        Современная платформа с удобными инструментами для волонтёров и организаций
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="smartphone" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-4">Telegram-интеграция</h3>
+        <p class="text-slate-600">
+          Получайте уведомления, подтверждайте участие и регистрируйтесь прямо в Telegram. 
+          Быстро и удобно.
+        </p>
+      </div>
+
+      <div class="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="qr-code" class="w-8 h-8 text-blue-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-4">QR-чекин</h3>
+        <p class="text-slate-600">
+          Быстрая регистрация на мероприятии через QR-код. 
+          Автоматический подсчёт волонтёрских часов.
+        </p>
+      </div>
+
+      <div class="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="calendar" class="w-8 h-8 text-purple-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-4">Умное расписание</h3>
+        <p class="text-slate-600">
+          Гибкая система ролей и смен. Автоматическое управление записью 
+          и листами ожидания.
+        </p>
+      </div>
+    </div>
+
+    <!-- Geofencing Feature -->
+    <div class="mt-8 text-center">
+      <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-6">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="map-pin" class="w-8 h-8 text-orange-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-3 text-orange-800">Геофенсинг</h3>
+        <p class="text-orange-700 mb-4">
+          Автоматическая проверка местоположения волонтеров при чекине. 
+          Технология GPS для контроля присутствия на мероприятии.
+        </p>
+        <a 
+          href="/demo/geofencing" 
+          class="inline-flex items-center bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+        >
+          <i data-lucide="play" class="w-4 h-4 mr-2"></i>
+          Посмотреть демо
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Events -->
+<% if (it.events && it.events.length > 0) { %>
+<section class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-12">
+      <h2 class="text-3xl font-bold text-slate-900">Ближайшие события</h2>
+      <a href="/events" class="text-emerald-600 hover:text-emerald-700 font-semibold inline-flex items-center">
+        Все события
+        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% it.events.slice(0, 6).forEach(event => { %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+          <% if (event.cover_url) { %>
+            <img src="<%= event.cover_url %>" alt="<%= event.title %>" class="w-full h-48 object-cover">
+          <% } else { %>
+            <div class="w-full h-48 bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+              <i data-lucide="heart-handshake" class="w-16 h-16 text-white"></i>
+            </div>
+          <% } %>
+          
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center text-sm text-slate-500 mb-2">
+              <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+              <%= event.start_date ? new Date(event.start_date).toLocaleDateString('ru-RU') : event.date %>
+            </div>
+            
+            <h3 class="text-xl font-semibold mb-2 text-slate-900">
+              <a href="/events/<%= event.id %>" class="hover:text-emerald-600 transition-colors">
+                <%= event.title %>
+              </a>
+            </h3>
+            
+            <!-- Description -->
+            <div class="flex-1 mb-4">
+              <p class="text-slate-600 line-clamp-3">
+                <%= event.short_description || event.description?.substring(0, 150) + '...' || 'Описание события' %>
+              </p>
+            </div>
+            
+            <!-- Footer -->
+            <div class="mt-auto">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center text-sm text-slate-500">
+                  <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                  <span class="truncate"><%= event.address || event.location || 'Онлайн' %></span>
+                </div>
+                <div class="text-sm text-slate-500 ml-2 flex-shrink-0">
+                  <%= event.org_name %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Statistics -->
+<section class="py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <div class="text-4xl font-bold text-emerald-600 mb-2"><%= it.stats?.volunteers || 0 %></div>
+        <div class="text-slate-600">Активных волонтёров</div>
+      </div>
+      <div>
+        <div class="text-4xl font-bold text-emerald-600 mb-2"><%= it.stats?.events || 0 %></div>
+        <div class="text-slate-600">Опубликованных событий</div>
+      </div>
+      <div>
+        <div class="text-4xl font-bold text-emerald-600 mb-2"><%= it.stats?.organizations || 0 %></div>
+        <div class="text-slate-600">Организаций</div>
+      </div>
+      <div>
+        <div class="text-4xl font-bold text-emerald-600 mb-2"><%= Math.round(it.stats?.hours || 0) %></div>
+        <div class="text-slate-600">Волонтёрских часов</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-emerald-600 text-white py-20">
+  <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl md:text-4xl font-bold mb-6">
+      Готовы изменить мир?
+    </h2>
+    <p class="text-xl mb-8 text-emerald-100">
+      Присоединяйтесь к сообществу людей, которые делают мир лучше каждый день
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/events" class="bg-white text-emerald-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-50 transition-colors">
+        Найти события
+      </a>
+      <a href="/register" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-emerald-600 transition-colors">
+        Зарегистрироваться
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Demo Users Section -->
+<section class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+        Демо-доступ для презентации
+      </h2>
+      <p class="text-xl text-slate-600 max-w-2xl mx-auto">
+        Попробуйте платформу от лица разных пользователей
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Волонтер -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="heart" class="w-8 h-8 text-blue-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Волонтер</h3>
+        <p class="text-slate-600 mb-6">Алексей Волонтёров<br>alex@example.com</p>
+        <form action="/login" method="POST" class="space-y-4">
+          <input type="hidden" name="csrf" value="<%= it.csrf %>">
+          <input type="hidden" name="email" value="alex@example.com">
+          <input type="hidden" name="password" value="demo123">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Войти как волонтер
+          </button>
+        </form>
+        <p class="text-sm text-slate-500 mt-3">
+          • Поиск событий<br>
+          • Подача заявок<br>
+          • Telegram интеграция
+        </p>
+      </div>
+
+      <!-- Координатор -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="users" class="w-8 h-8 text-emerald-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Координатор</h3>
+        <p class="text-slate-600 mb-6">Сергей Координатор<br>sergey@example.com</p>
+        <form action="/login" method="POST" class="space-y-4">
+          <input type="hidden" name="csrf" value="<%= it.csrf %>">
+          <input type="hidden" name="email" value="sergey@example.com">
+          <input type="hidden" name="password" value="demo123">
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Войти как координатор
+          </button>
+        </form>
+        <p class="text-sm text-slate-500 mt-3">
+          • Управление событиями<br>
+          • Live-панель<br>
+          • Аналитика и отчеты
+        </p>
+      </div>
+
+      <!-- Организатор -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="building" class="w-8 h-8 text-orange-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Организатор</h3>
+        <p class="text-slate-600 mb-6">Елена Организаторша<br>elena.organizer@example.com</p>
+        <form action="/login" method="POST" class="space-y-4">
+          <input type="hidden" name="csrf" value="<%= it.csrf %>">
+          <input type="hidden" name="email" value="elena.organizer@example.com">
+          <input type="hidden" name="password" value="demo123">
+          <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Войти как организатор
+          </button>
+        </form>
+        <p class="text-sm text-slate-500 mt-3">
+          • Создание событий<br>
+          • Управление заявками<br>
+          • Дашборд организации
+        </p>
+      </div>
+
+      <!-- Администратор -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i data-lucide="crown" class="w-8 h-8 text-slate-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Администратор</h3>
+        <p class="text-slate-600 mb-6">Дмитрий Разработчик<br>admin@example.com</p>
+        <form action="/login" method="POST" class="space-y-4">
+          <input type="hidden" name="csrf" value="<%= it.csrf %>">
+          <input type="hidden" name="email" value="admin@example.com">
+          <input type="hidden" name="password" value="demo123">
+          <button type="submit" class="w-full bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Войти как админ
+          </button>
+        </form>
+        <p class="text-sm text-slate-500 mt-3">
+          • Все роли в одном<br>
+          • Полный доступ<br>
+          • Системное управление
+        </p>
+      </div>
+    </div>
+
+    <div class="text-center mt-12">
+      <p class="text-slate-600">
+        <strong>Пароль для всех демо-пользователей:</strong> <code class="bg-slate-200 px-2 py-1 rounded">demo123</code>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Initialize icons after page load
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+</script>

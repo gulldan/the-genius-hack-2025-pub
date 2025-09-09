@@ -1,0 +1,25 @@
+<% layout('layout', { title: 'Избранное - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Избранные события</h1>
+  <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ids = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const grid = document.getElementById('favorites-grid');
+    if (ids.length) {
+      fetch(`/events/favorites?ids=${ids.join(',')}`)
+        .then(r => r.text())
+        .then(html => {
+          grid.innerHTML = html;
+          if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+          }
+        });
+    } else {
+      grid.innerHTML = '<p class="text-slate-600">Нет избранных событий</p>';
+    }
+  });
+</script>

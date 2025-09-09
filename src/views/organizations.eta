@@ -1,0 +1,115 @@
+<% layout('layout', { title: 'Организации - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Организации</h1>
+    <p class="text-xl text-slate-600">Познакомьтесь с организациями, которые делают мир лучше</p>
+  </div>
+
+  <!-- CTA for organizations -->
+  <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-semibold text-emerald-900 mb-2">Вы организация?</h2>
+        <p class="text-emerald-700">Присоединяйтесь к платформе и находите волонтёров для ваших мероприятий</p>
+      </div>
+      <a href="/org/register" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center">
+        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+        Зарегистрироваться
+      </a>
+    </div>
+  </div>
+
+  <!-- Organizations Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% if (it.organizations && it.organizations.length > 0) { %>
+      <% it.organizations.forEach(org => { %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+          <!-- Organization Header -->
+          <div class="p-6">
+            <div class="flex items-start space-x-4">
+              <% if (org.logo_url) { %>
+                <img src="<%= org.logo_url %>" alt="<%= org.name %>" class="w-16 h-16 rounded-lg object-cover">
+              <% } else { %>
+                <div class="w-16 h-16 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <i data-lucide="building" class="w-8 h-8 text-emerald-600"></i>
+                </div>
+              <% } %>
+              
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-slate-900 mb-1">
+                  <%= org.name %>
+                </h3>
+                <% if (org.city) { %>
+                  <p class="text-sm text-slate-600 mb-2 flex items-center">
+                    <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                    <%= org.city %>
+                  </p>
+                <% } %>
+                
+                <div class="flex items-center space-x-4 text-sm text-slate-500">
+                  <span class="flex items-center">
+                    <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+                    <%= org.events_count %> событий
+                  </span>
+                  <% if (org.upcoming_events > 0) { %>
+                    <span class="flex items-center text-green-600">
+                      <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                      <%= org.upcoming_events %> предстоящих
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <% if (org.description) { %>
+              <p class="text-slate-600 mt-4 line-clamp-3">
+                <%= org.description %>
+              </p>
+            <% } %>
+
+            <!-- Links -->
+            <div class="flex items-center justify-between mt-6">
+              <div class="flex space-x-3">
+                <% if (org.website) { %>
+                  <a href="<%= org.website %>" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                    Сайт
+                  </a>
+                <% } %>
+                <% if (org.email) { %>
+                  <a href="mailto:<%= org.email %>" class="text-slate-600 hover:text-slate-700 text-sm font-medium">
+                    Контакт
+                  </a>
+                <% } %>
+              </div>
+              
+              <a href="/org/<%= org.id %>/events" class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                События →
+              </a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-span-full text-center py-12">
+        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="building" class="w-12 h-12 text-slate-400"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Организации не найдены</h3>
+        <p class="text-slate-600 mb-6">Станьте первой организацией на платформе!</p>
+        <a href="/org/register" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-medium transition-colors">
+          <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+          Зарегистрировать организацию
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+</script>

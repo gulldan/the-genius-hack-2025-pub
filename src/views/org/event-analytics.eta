@@ -1,0 +1,34 @@
+<% layout('../layout', { title: `Аналитика события - ${it.event.title}` }) %>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold"><%= it.event.title %></h1>
+      <a
+        href="/org/<%= it.orgId %>/events/<%= it.event.id %>/export"
+        class="flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-sm font-medium"
+      >
+        <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+        Экспорт CSV
+      </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">Заявки</h2>
+      <p>Всего: <%= it.analytics.total || 0 %></p>
+      <p>Одобрено: <%= it.analytics.approved || 0 %></p>
+      <p>Лист ожидания: <%= it.analytics.waitlisted || 0 %></p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold mb-4">Явка</h2>
+      <p>Пришли: <%= it.attendance.attended || 0 %></p>
+      <p>Часы: <%= it.attendance.hours || 0 %></p>
+    </div>
+  </div>
+  <div class="mt-6">
+    <a href="/org/<%= it.orgId %>/events" class="text-slate-600 hover:text-slate-900">← Назад к событиям</a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() { lucide.createIcons(); });
+</script>

@@ -1,0 +1,244 @@
+<% layout('../layout', { title: 'Киоск чекина - VolunteerHub' }) %>
+
+<div class="min-h-screen bg-slate-900 text-white flex flex-col">
+  <!-- Header -->
+  <header class="bg-slate-800 border-b border-slate-700 p-6">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
+          <i data-lucide="qr-code" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">Киоск чекина</h1>
+          <p class="text-slate-400">Отсканируйте QR-код для регистрации</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm text-slate-400">Мероприятие</div>
+        <div class="font-semibold"><%= it.event?.title || 'Загрузка...' %></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center p-8">
+    <div class="max-w-2xl w-full text-center">
+      
+      <!-- QR Scanner -->
+      <div id="scanner-container" class="bg-slate-800 rounded-2xl p-8 mb-8">
+        <div class="w-80 h-80 mx-auto bg-slate-700 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden">
+          <video id="qr-video" class="w-full h-full object-cover rounded-xl hidden"></video>
+          <div id="scanner-placeholder" class="text-center">
+            <i data-lucide="camera" class="w-16 h-16 text-slate-500 mx-auto mb-4"></i>
+            <p class="text-slate-400 mb-4">Нажмите для запуска сканера</p>
+            <button 
+              id="start-scanner" 
+              class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Запустить сканер
+            </button>
+          </div>
+          <div id="qr-overlay" class="absolute inset-0 hidden">
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-emerald-500 rounded-lg"></div>
+          </div>
+        </div>
+        
+        <p class="text-slate-300 text-lg">
+          Покажите QR-код волонтёра камере
+        </p>
+      </div>
+
+      <!-- Manual Input -->
+      <div class="bg-slate-800 rounded-2xl p-6">
+        <h3 class="text-xl font-semibold mb-4">Ручной ввод</h3>
+        <div class="flex gap-3">
+          <input 
+            type="text" 
+            id="manual-code" 
+            placeholder="Введите код чекина..." 
+            class="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          >
+          <button 
+            id="manual-checkin" 
+            class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Чекин
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Status Messages -->
+  <div id="status-messages" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center text-slate-900">
+      <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="check-circle" class="w-10 h-10 text-green-600"></i>
+      </div>
+      <h3 class="text-2xl font-bold mb-2">Чекин успешен!</h3>
+      <p class="text-slate-600 mb-2" id="success-name"></p>
+      <p class="text-slate-500 text-sm mb-6" id="success-role"></p>
+      <button 
+        id="close-success" 
+        class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+      >
+        Продолжить
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Modal -->
+  <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center text-slate-900">
+      <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="x-circle" class="w-10 h-10 text-red-600"></i>
+      </div>
+      <h3 class="text-2xl font-bold mb-2">Ошибка чекина</h3>
+      <p class="text-slate-600 mb-6" id="error-message"></p>
+      <button 
+        id="close-error" 
+        class="bg-slate-600 hover:bg-slate-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+      >
+        Попробовать снова
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+<script>
+  let qrScanner = null;
+  let isScanning = false;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    const video = document.getElementById('qr-video');
+    const startButton = document.getElementById('start-scanner');
+    const placeholder = document.getElementById('scanner-placeholder');
+    const overlay = document.getElementById('qr-overlay');
+    const manualInput = document.getElementById('manual-code');
+    const manualButton = document.getElementById('manual-checkin');
+
+    // Initialize QR Scanner
+    startButton.addEventListener('click', async function() {
+      try {
+        qrScanner = new QrScanner(video, result => handleScanResult(result.data), {
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+        });
+
+        await qrScanner.start();
+        
+        placeholder.classList.add('hidden');
+        video.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        isScanning = true;
+        
+        showStatus('Сканер запущен', 'success');
+      } catch (error) {
+        console.error('Failed to start scanner:', error);
+        showStatus('Не удалось запустить камеру', 'error');
+      }
+    });
+
+    // Manual checkin
+    manualButton.addEventListener('click', function() {
+      const code = manualInput.value.trim();
+      if (code) {
+        handleScanResult(code);
+        manualInput.value = '';
+      }
+    });
+
+    manualInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        manualButton.click();
+      }
+    });
+
+    // Modal handlers
+    document.getElementById('close-success').addEventListener('click', function() {
+      document.getElementById('success-modal').classList.add('hidden');
+    });
+
+    document.getElementById('close-error').addEventListener('click', function() {
+      document.getElementById('error-modal').classList.add('hidden');
+    });
+  });
+
+  function handleScanResult(data) {
+    console.log('Scanned:', data);
+    
+    // Process checkin
+    fetch('/checkin/process', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ qr_data: data })
+    })
+    .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          showSuccessModal(result.volunteer_name, result.role_title);
+          showStatus('Чекин успешен: ' + result.volunteer_name, 'success');
+          trackEvent('checkin_success', { event_id: <%= it.event?.id || 0 %> });
+        } else {
+          showErrorModal(result.error || 'Неизвестная ошибка');
+          showStatus('Ошибка чекина: ' + result.error, 'error');
+        }
+      })
+    .catch(error => {
+      console.error('Checkin error:', error);
+      showErrorModal('Ошибка соединения с сервером');
+      showStatus('Ошибка соединения', 'error');
+    });
+  }
+
+  function showSuccessModal(name, role) {
+    document.getElementById('success-name').textContent = name;
+    document.getElementById('success-role').textContent = role;
+    document.getElementById('success-modal').classList.remove('hidden');
+    
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      document.getElementById('success-modal').classList.add('hidden');
+    }, 3000);
+  }
+
+  function showErrorModal(message) {
+    document.getElementById('error-message').textContent = message;
+    document.getElementById('error-modal').classList.remove('hidden');
+  }
+
+  function showStatus(message, type) {
+    const container = document.getElementById('status-messages');
+    const status = document.createElement('div');
+    status.className = `px-4 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
+      type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+    }`;
+    status.textContent = message;
+    
+    container.appendChild(status);
+    
+    // Animate in
+    setTimeout(() => status.classList.remove('translate-x-full'), 100);
+    
+    // Auto remove
+    setTimeout(() => {
+      status.classList.add('translate-x-full');
+      setTimeout(() => container.removeChild(status), 300);
+    }, 3000);
+  }
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', function() {
+    if (qrScanner) {
+      qrScanner.stop();
+    }
+  });
+</script>

@@ -1,0 +1,167 @@
+<% layout('../layout', { title: `События ${it.org?.name || ''} - KvadricepsHub` }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-2">
+          События организации
+        </h1>
+        <% if (it.org) { %>
+          <p class="text-slate-600"><%= it.org.name %></p>
+        <% } %>
+      </div>
+      <div class="flex space-x-4">
+        <a href="/org/<%= it.orgId %>/events/new" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+          <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+          Создать событие
+        </a>
+        <a href="/org/<%= it.orgId %>" class="border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors inline-flex items-center">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+          К дашборду
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" class="mb-6 flex flex-wrap gap-4">
+    <select name="status" class="border border-slate-300 rounded-md px-3 py-2">
+      <option value="">Все статусы</option>
+      <option value="draft" <%= it.currentStatus === 'draft' ? 'selected' : '' %>>Черновик</option>
+      <option value="published" <%= it.currentStatus === 'published' ? 'selected' : '' %>>Опубликовано</option>
+      <option value="closed" <%= it.currentStatus === 'closed' ? 'selected' : '' %>>Закрыто</option>
+    </select>
+    <input type="date" name="date" value="<%= it.currentDate || '' %>" class="border border-slate-300 rounded-md px-3 py-2" />
+    <input type="text" name="city" value="<%= it.currentCity || '' %>" placeholder="Город" class="border border-slate-300 rounded-md px-3 py-2" />
+    <button type="submit" class="px-4 py-2 bg-slate-200 rounded-md">Фильтр</button>
+  </form>
+
+  <!-- Events Grid -->
+  <% if (it.events && it.events.length > 0) { %>
+    <form method="post" action="/org/<%= it.orgId %>/events/bulk">
+      <div class="flex items-center gap-2 mb-4">
+        <select name="action" class="border border-slate-300 rounded-md px-3 py-2">
+          <option value="publish">Опубликовать</option>
+          <option value="close">Закрыть</option>
+          <option value="delete">Удалить</option>
+        </select>
+        <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-md">Применить</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% it.events.forEach(event => { %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow p-2">
+          <input type="checkbox" name="ids" value="<%= event.id %>" class="mb-2">
+          <!-- Event Image -->
+          <% if (event.cover_url) { %>
+            <img src="<%= event.cover_url %>" alt="<%= event.title %>" class="w-full h-48 object-cover">
+          <% } else { %>
+            <div class="w-full h-48 bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
+              <i data-lucide="heart-handshake" class="w-16 h-16 text-white"></i>
+            </div>
+          <% } %>
+          
+          <div class="p-6">
+            <!-- Event Meta -->
+            <div class="flex items-center justify-between text-sm text-slate-500 mb-3">
+              <div class="flex items-center">
+                <i data-lucide="calendar" class="w-4 h-4 mr-1"></i>
+                <%= event.start_date ? new Date(event.start_date).toLocaleDateString('ru-RU') : (event.date || 'Дата не указана') %>
+              </div>
+              <% if (event.category) { %>
+                <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
+                  <% 
+                    const categoryNames = {
+                      'health': 'Здоровье',
+                      'social': 'Соц. помощь',
+                      'education': 'Образование',
+                      'culture': 'Культура',
+                      'sports': 'Спорт'
+                    };
+                  %>
+                  <%= categoryNames[event.category] || event.category %>
+                </span>
+              <% } %>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-xl font-semibold mb-2 text-slate-900">
+              <%= event.title %>
+            </h3>
+            
+            <!-- Description -->
+            <p class="text-slate-600 mb-4 line-clamp-2">
+              <%= event.short_description || event.description || 'Описание события' %>
+            </p>
+            
+            <!-- Status -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2 py-1 rounded-full text-xs font-medium
+                <% if (event.status === 'published') { %>bg-green-100 text-green-800
+                <% } else if (event.status === 'draft') { %>bg-yellow-100 text-yellow-800
+                <% } else { %>bg-slate-100 text-slate-800<% } %>">
+                <% 
+                  const statusNames = {
+                    'draft': 'Черновик',
+                    'published': 'Опубликовано',
+                    'closed': 'Закрыто',
+                    'cancelled': 'Отменено'
+                  };
+                %>
+                <%= statusNames[event.status] || event.status %>
+              </span>
+              
+              <div class="text-sm text-slate-500">
+                <%= event.address || 'Онлайн' %>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2">
+              <div class="flex gap-2">
+                <a href="/org/<%= it.orgId %>/events/<%= event.id %>/roles" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md font-medium transition-colors">
+                  Управление
+                </a>
+                <a href="/events/<%= event.id %>" class="flex-1 border border-slate-300 hover:bg-slate-50 text-slate-700 text-center py-2 px-4 rounded-md font-medium transition-colors">
+                  Просмотр
+                </a>
+              </div>
+              <div class="flex gap-2">
+                <a href="/org/<%= it.orgId %>/events/<%= event.id %>/edit" class="flex-1 border border-slate-300 hover:bg-slate-50 text-slate-700 text-center py-2 px-4 rounded-md font-medium transition-colors">
+                  Редактировать
+                </a>
+                <a href="/org/<%= it.orgId %>/events/<%= event.id %>/copy" class="flex-1 border border-slate-300 hover:bg-slate-50 text-slate-700 text-center py-2 px-4 rounded-md font-medium transition-colors">
+                  Копировать
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+      </div>
+    </form>
+  <% } else { %>
+    <!-- Empty State -->
+    <div class="text-center py-16">
+      <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="calendar-plus" class="w-12 h-12 text-slate-400"></i>
+      </div>
+      <h2 class="text-2xl font-semibold text-slate-900 mb-4">Событий пока нет</h2>
+      <p class="text-slate-600 mb-8 max-w-md mx-auto">
+        Создайте первое мероприятие для привлечения волонтёров
+      </p>
+      <a href="/org/<%= it.orgId %>/events/new" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+        Создать первое событие
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+</script>
+

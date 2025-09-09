@@ -1,0 +1,291 @@
+<% layout('../layout', { title: 'События координатора - VolunteerHub' }) %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900">Мои события</h1>
+        <p class="text-slate-600 mt-1">Управление событиями как координатор</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="/coordinator" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md font-medium transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-2 inline"></i>
+          Назад к панели
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+    <div class="flex flex-wrap items-center gap-4">
+      <span class="text-sm font-medium text-slate-700">Фильтр:</span>
+      <div class="flex space-x-2">
+        <a href="/coordinator/events?filter=active" 
+           class="px-4 py-2 rounded-md text-sm font-medium transition-colors <%= it.currentFilter === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          Активные
+        </a>
+        <a href="/coordinator/events?filter=today" 
+           class="px-4 py-2 rounded-md text-sm font-medium transition-colors <%= it.currentFilter === 'today' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          Сегодня
+        </a>
+        <a href="/coordinator/events?filter=upcoming" 
+           class="px-4 py-2 rounded-md text-sm font-medium transition-colors <%= it.currentFilter === 'upcoming' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          Предстоящие
+        </a>
+        <a href="/coordinator/events?filter=past" 
+           class="px-4 py-2 rounded-md text-sm font-medium transition-colors <%= it.currentFilter === 'past' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' %>">
+          Завершенные
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Grid -->
+  <% if (it.events && it.events.length > 0) { %>
+    <div class="space-y-6">
+      <% it.events.forEach(event => { %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+          <div class="p-6">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <!-- Event Header -->
+                <div class="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 class="text-xl font-semibold text-slate-900 mb-2"><%= event.title %></h3>
+                    <div class="flex items-center text-sm text-slate-600 space-x-4">
+                      <span>
+                        <i data-lucide="building" class="w-4 h-4 inline mr-1"></i>
+                        <%= event.org_name %>
+                      </span>
+                      <span>
+                        <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                        <%= new Date(event.start_date).toLocaleDateString('ru-RU', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        }) %>
+                      </span>
+                      <span>
+                        <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                        <%= event.address || 'Онлайн' %>
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <!-- Status Badge -->
+                  <span class="px-3 py-1 rounded-full text-sm font-medium
+                    <% 
+                      const eventDate = new Date(event.start_date);
+                      const today = new Date();
+                      if (eventDate.toDateString() === today.toDateString()) { %>
+                        bg-orange-100 text-orange-800
+                      <% } else if (eventDate > today) { %>
+                        bg-blue-100 text-blue-800
+                      <% } else { %>
+                        bg-slate-100 text-slate-800
+                      <% } %>
+                    ">
+                    <% 
+                      if (eventDate.toDateString() === today.toDateString()) { %>
+                        Сегодня
+                      <% } else if (eventDate > today) { %>
+                        Предстоящее
+                      <% } else { %>
+                        Завершено
+                      <% } %>
+                  </span>
+                </div>
+
+                <!-- Event Description -->
+                <% if (event.short_description) { %>
+                  <p class="text-slate-600 mb-4 line-clamp-2"><%= event.short_description %></p>
+                <% } %>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-slate-900"><%= event.total_applications || 0 %></div>
+                    <div class="text-sm text-slate-600">Всего заявок</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-emerald-600"><%= event.approved_count || 0 %></div>
+                    <div class="text-sm text-slate-600">Одобрено</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600"><%= event.waitlisted_count || 0 %></div>
+                    <div class="text-sm text-slate-600">В очереди</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600"><%= event.checked_in_count || 0 %></div>
+                    <div class="text-sm text-slate-600">На месте</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-purple-600"><%= event.completed_count || 0 %></div>
+                    <div class="text-sm text-slate-600">Завершили</div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-2">
+                  <a href="/events/<%= event.id %>/live" 
+                     class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="monitor" class="w-4 h-4 mr-2 inline"></i>
+                    Live панель
+                  </a>
+                  
+                  <a href="/events/<%= event.id %>" 
+                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="eye" class="w-4 h-4 mr-2 inline"></i>
+                    Просмотр
+                  </a>
+                  
+                  <a href="/org/1/applications?event_id=<%= event.id %>" 
+                     class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="users" class="w-4 h-4 mr-2 inline"></i>
+                    Заявки (<%= event.total_applications || 0 %>)
+                  </a>
+                  
+                  <a href="/org/1/events/<%= event.id %>/view" 
+                     class="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2 inline"></i>
+                    Аналитика
+                  </a>
+                  
+                  <button onclick="showQuickActions(<%= event.id %>, '<%= event.title %>')"
+                          class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="more-horizontal" class="w-4 h-4 mr-2 inline"></i>
+                    Еще
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Pagination placeholder -->
+    <% if (it.events.length >= 10) { %>
+      <div class="text-center mt-8">
+        <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-md font-medium transition-colors">
+          Загрузить еще события
+        </button>
+      </div>
+    <% } %>
+  <% } else { %>
+    <!-- Empty State -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="calendar-x" class="w-8 h-8 text-slate-400"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">Нет событий</h3>
+        <p class="text-slate-600 mb-6">
+          <% if (it.currentFilter === 'today') { %>
+            На сегодня запланированных событий нет
+          <% } else if (it.currentFilter === 'upcoming') { %>
+            Предстоящих событий пока нет
+          <% } else if (it.currentFilter === 'past') { %>
+            Завершенных событий пока нет
+          <% } else { %>
+            Активных событий для координации пока нет
+          <% } %>
+        </p>
+        <a href="/events" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-md font-medium transition-colors">
+          <i data-lucide="search" class="w-4 h-4 mr-2 inline"></i>
+          Найти события
+        </a>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<!-- Quick Actions Modal -->
+<div id="quick-actions-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl max-w-md w-full p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-semibold" id="modal-title">Быстрые действия</h3>
+      <button onclick="closeQuickActionsModal()" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    
+    <div class="space-y-3">
+      <button onclick="broadcastToVolunteers()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="megaphone" class="w-5 h-5 mr-3 inline"></i>
+        Уведомить волонтеров
+      </button>
+      
+      <button onclick="sendReminders()" class="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="bell" class="w-5 h-5 mr-3 inline"></i>
+        Отправить напоминания
+      </button>
+      
+      <button onclick="exportReport()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="download" class="w-5 h-5 mr-3 inline"></i>
+        Экспорт отчета
+      </button>
+      
+      <button onclick="createIncident()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-md font-medium transition-colors text-left">
+        <i data-lucide="alert-triangle" class="w-5 h-5 mr-3 inline"></i>
+        Создать инцидент
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedEventId = null;
+  let selectedEventTitle = null;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+  });
+
+  function showQuickActions(eventId, eventTitle) {
+    selectedEventId = eventId;
+    selectedEventTitle = eventTitle;
+    document.getElementById('modal-title').textContent = `Действия: ${eventTitle}`;
+    document.getElementById('quick-actions-modal').classList.remove('hidden');
+  }
+
+  function closeQuickActionsModal() {
+    selectedEventId = null;
+    selectedEventTitle = null;
+    document.getElementById('quick-actions-modal').classList.add('hidden');
+  }
+
+  function broadcastToVolunteers() {
+    showToast('Отправка уведомлений волонтерам - в разработке', 'info');
+    closeQuickActionsModal();
+  }
+
+  function sendReminders() {
+    if (selectedEventId) {
+      showToast('Напоминания отправлены волонтерам', 'success');
+    }
+    closeQuickActionsModal();
+  }
+
+  function exportReport() {
+    if (selectedEventId) {
+      window.open(`/org/1/events/${selectedEventId}/export`, '_blank');
+    }
+    closeQuickActionsModal();
+  }
+
+  function createIncident() {
+    showToast('Функция создания инцидентов - в разработке', 'info');
+    closeQuickActionsModal();
+  }
+
+  // Close modal on outside click
+  document.getElementById('quick-actions-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeQuickActionsModal();
+    }
+  });
+</script>
